@@ -112,6 +112,13 @@ network_users_filter = r.json()['items'][0]['filter']
 # step 2
 r = requests.get(base_url + f"users/{args.user_id}/associated",
                  params={"key":api_key,"filter":network_users_filter})
-data = r.json()
+site_names = []
+user_ids = []
+for item in r.json()['items']:
+    user_ids.append(item['user_id'])
+    site_url = item['site_url']
+    # skip the first 8 characters in the site url to get the site name. This will be
+    # used later to query different sites
+    site_names.append(site_url[8:])
 
-print(r.json())
+# step 3
