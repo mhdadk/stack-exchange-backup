@@ -97,7 +97,21 @@ api_key = "YLTVFmHkeJbm7ZIOoXstag(("
 # this must appear before every request
 base_url = "https://api.stackexchange.com/2.3/"
 
+# step 1
+r = requests.get(base_url + f"filters/create",
+                 params={"include":"network_user.site_url;\
+                                    network_user.user_id;\
+                                    .items;\
+                                    .has_more;\
+                                    .quota_max;\
+                                    .quota_remaining",
+                         "base":"none",
+                         "unsafe":"false"})
+network_users_filter = r.json()['items'][0]['filter']
+
 # step 2
-r = requests.get(base_url + f"users/{args.user_id}/associated",params={"key":api_key})
+r = requests.get(base_url + f"users/{args.user_id}/associated",
+                 params={"key":api_key,"filter":network_users_filter})
+data = r.json()
 
 print(r.json())
