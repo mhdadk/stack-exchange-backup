@@ -58,8 +58,15 @@ TODO: remove these
         i. Extract the question_id field using the filter created in step 4.
         ii. Open a .md file and put the question, along with the extracted answer, into
         the file.
+
+Before doing all of this, you will need to authorize this stack app by going to the
+following URL ONLY ONCE:
+https://stackoverflow.com/oauth/dialog?client_id=28114&redirect_uri=https://stackoverflow.com/oauth/login_success
+
+You will then need to get the access token. See this answer for details:
+https://stackapps.com/a/6638/120681
 """
 
 import requests
 
-# get all the stack exchange sites associated with this account
+# step 1
