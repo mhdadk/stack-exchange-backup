@@ -158,4 +158,3 @@ p.mkdir("q_and_a",exist_ok=True)
 p.mkdir("q_and_a/questions",exist_ok=True)
 p.mkdir("q_and_a/answers",exist_ok=True)
 
-
