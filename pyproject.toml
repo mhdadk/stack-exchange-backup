@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "get-se-pages"
+version = "0.1.0"
+description = ""
+authors = ["Mahmoud Abdelkhalek <maabdelk@ncsu.edu>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pywebcopy = "^7.0.2"
+requests = "^2.31.0"
+beautifulsoup4 = "^4.12.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
