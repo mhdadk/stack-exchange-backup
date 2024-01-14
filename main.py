@@ -81,6 +81,7 @@ NOTE: the access token is valid for 1 day only and changes every time you author
 
 import requests
 import argparse
+import pathlib
 
 # parse command-line arguments
 parser = argparse.ArgumentParser()
@@ -99,12 +100,12 @@ base_url = "https://api.stackexchange.com/2.3/"
 
 # step 1
 r = requests.get(base_url + f"filters/create",
-                 params={"include":"network_user.site_url;\
-                                    network_user.user_id;\
-                                    .items;\
+                 params={"include":".items;\
                                     .has_more;\
                                     .quota_max;\
-                                    .quota_remaining",
+                                    .quota_remaining;\
+                                    network_user.site_url;\
+                                    network_user.user_id",
                          "base":"none",
                          "unsafe":"false"})
 network_users_filter = r.json()['items'][0]['filter']
@@ -122,3 +123,39 @@ for item in r.json()['items']:
     site_names.append(site_url[8:])
 
 # step 3
+r = requests.get(base_url + f"filters/create",
+                 params={"include":".items;\
+                                    .has_more;\
+                                    .quota_max;\
+                                    .quota_remaining;\
+                                    question.answers;\
+                                    question.body_markdown;\
+                                    question.comments;\
+                                    question.creation_date\
+                                    question.down_vote_count;\
+                                    question.up_vote_count;\
+                                    question.score",
+                         "base":"none",
+                         "unsafe":"false"})
+questions_filter = r.json()['items'][0]['filter']
+
+# step 4
+r = requests.get(base_url + f"filters/create",
+                 params={"include":".items;\
+                                    .has_more;\
+                                    .quota_max;\
+                                    .quota_remaining;\
+                                    answer.question_id",
+                         "base":"none",
+                         "unsafe":"false"})
+answers_filter = r.json()['items'][0]['filter']
+
+# step 5
+
+# create the necessary directories (do nothing if they already exist)
+p = pathlib.Path(".")
+p.mkdir("q_and_a",exist_ok=True)
+p.mkdir("q_and_a/questions",exist_ok=True)
+p.mkdir("q_and_a/answers",exist_ok=True)
+
+
