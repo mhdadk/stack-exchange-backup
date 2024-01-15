@@ -100,7 +100,8 @@ base_url = "https://api.stackexchange.com/2.3/"
 
 # step 1
 r = requests.get(base_url + f"filters/create",
-                 params={"include":".items;\
+                 params={"key":api_key,
+                         "include":".items;\
                                     .has_more;\
                                     .quota_max;\
                                     .quota_remaining;\
@@ -124,24 +125,39 @@ for item in r.json()['items']:
 
 # step 3
 r = requests.get(base_url + f"filters/create",
-                 params={"include":".items;\
+                 params={"key":api_key,
+                         "include":".items;\
                                     .has_more;\
                                     .quota_max;\
                                     .quota_remaining;\
                                     question.answers;\
+                                    question.title;\
                                     question.body_markdown;\
                                     question.comments;\
-                                    question.creation_date\
+                                    question.creation_date;\
                                     question.down_vote_count;\
                                     question.up_vote_count;\
-                                    question.score",
+                                    question.score;\
+                                    question.owner;\
+                                    answer.body_markdown;\
+                                    answer.comments;\
+                                    answer.creation_date;\
+                                    answer.is_accepted;\
+                                    answer.down_vote_count;\
+                                    answer.up_vote_count;\
+                                    answer.score:\
+                                    comment.body_markdown;\
+                                    comment.creation_date;\
+                                    comment.owner;\
+                                    comment.score",
                          "base":"none",
                          "unsafe":"false"})
 questions_filter = r.json()['items'][0]['filter']
 
 # step 4
 r = requests.get(base_url + f"filters/create",
-                 params={"include":".items;\
+                 params={"key":api_key,
+                         "include":".items;\
                                     .has_more;\
                                     .quota_max;\
                                     .quota_remaining;\
@@ -154,7 +170,15 @@ answers_filter = r.json()['items'][0]['filter']
 
 # create the necessary directories (do nothing if they already exist)
 p = pathlib.Path(".")
-p.mkdir("q_and_a",exist_ok=True)
-p.mkdir("q_and_a/questions",exist_ok=True)
-p.mkdir("q_and_a/answers",exist_ok=True)
+(p / "q_and_a").mkdir(exist_ok=True)
+(p / "q_and_a" / "questions").mkdir(exist_ok=True)
+(p / "q_and_a" / "answers").mkdir(exist_ok=True)
 
+# iterate over the sites
+for site_name,user_id in zip(site_names,user_ids):
+    # get all questions for this site
+    r = requests.get(base_url + f"users/{user_id}/questions",
+                     params={"key":api_key,
+                             "site":site_name,
+                             "filter":questions_filter})
+    print(r)
