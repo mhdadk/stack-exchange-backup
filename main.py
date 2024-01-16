@@ -241,16 +241,23 @@ def write_question(target_dir,question):
     # if the file already exists, then skip it to save time
     if fpath.exists():
         return
-    f = fpath.open(mode="w")
+    # see https://stackoverflow.com/a/42495690/13809128 for why "encoding" parameter is
+    # needed
+    f = fpath.open(mode="w",encoding="utf-8")
     # question metadata
     f.write(f"Question downloaded from {question['link']}\\\n")
     creation_datetime = datetime.datetime.fromtimestamp(question['creation_date'],
                                                         tz=datetime.timezone.utc)
     # question may be a community wiki, in which case it has no owner
     if "owner" in question:
-        f.write(f"Question asked by {question['owner']['display_name']} on "\
-                f"{creation_datetime.strftime('%Y-%m-%d')} at "\
-                f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
+        if "display_name" in question["owner"]:
+            f.write(f"Question asked by {question['owner']['display_name']} on "\
+                    f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
+        else:
+            f.write(f"Question is community-owned and was asked on "\
+                    f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
     else:
         f.write(f"Question is community-owned and was asked on "\
                 f"{creation_datetime.strftime('%Y-%m-%d')} at "\
@@ -275,9 +282,14 @@ def write_question(target_dir,question):
         creation_datetime = datetime.datetime.fromtimestamp(comment['creation_date'],
                                                             tz=datetime.timezone.utc)
         if "owner" in comment:
-            f.write(f"Comment made by {comment['owner']['display_name']} on "\
-                    f"{creation_datetime.strftime('%Y-%m-%d')} at "\
-                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
+            if "display_name" in comment["owner"]:
+                f.write(f"Comment made by {comment['owner']['display_name']} on "\
+                        f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                        f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
+            else:
+                f.write(f"Comment made anonymously and was asked on "\
+                        f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                        f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
         else:
             f.write(f"Comment made anonymously and was asked on "\
                     f"{creation_datetime.strftime('%Y-%m-%d')} at "\
@@ -290,9 +302,14 @@ def write_question(target_dir,question):
         creation_datetime = datetime.datetime.fromtimestamp(answer['creation_date'],
                                                             tz=datetime.timezone.utc)
         if "owner" in answer:
-            f.write(f"Answer by {answer['owner']['display_name']} on "\
-                    f"{creation_datetime.strftime('%Y-%m-%d')} at "\
-                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
+            if "display_name" in answer["owner"]:
+                f.write(f"Answer by {answer['owner']['display_name']} on "\
+                        f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                        f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
+            else:
+                f.write(f"Anonymous answer that was created on "\
+                        f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                        f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
         else:
             f.write(f"Anonymous answer that was created on "\
                     f"{creation_datetime.strftime('%Y-%m-%d')} at "\
@@ -311,7 +328,12 @@ def write_question(target_dir,question):
             creation_datetime = datetime.datetime.fromtimestamp(comment['creation_date'],
                                                                 tz=datetime.timezone.utc)
             if "owner" in comment:
-                f.write(f"Comment made by {comment['owner']['display_name']} on "\
+                if "display_name" in comment["owner"]:
+                    f.write(f"Comment made by {comment['owner']['display_name']} on "\
+                            f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                            f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
+                else:
+                    f.write(f"Comment made anonymously and was asked on "\
                         f"{creation_datetime.strftime('%Y-%m-%d')} at "\
                         f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
             else:
@@ -326,7 +348,7 @@ def write_question(target_dir,question):
 # iterate over the sites
 for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
     print(f"Downloading and writing questions from site "\
-          f"{i+1}/{len(site_names)} ({site_name})...",end="")
+          f"{i+1}/{len(site_names)} ({site_name})...",end="",flush=True)
     # create the "questions" directory for this site
     questions_dir = top_level_dir / site_name / "questions"
     questions_dir.mkdir(parents=True,exist_ok=True)
@@ -359,7 +381,7 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
             write_question(questions_dir,question)
     print(f"Done.")
     print(f"Downloading and writing answers from site "\
-          f"{i+1}/{len(site_names)} ({site_name})...",end="")
+          f"{i+1}/{len(site_names)} ({site_name})...",end="",flush=True)
     # create the "answers" directory for this site
     answers_dir = top_level_dir / site_name / "answers"
     answers_dir.mkdir(parents=True,exist_ok=True)
