@@ -97,6 +97,7 @@ import requests
 import argparse
 import pathlib
 import datetime
+import html
 
 # parse command-line arguments
 parser = argparse.ArgumentParser()
@@ -105,6 +106,9 @@ parser.add_argument("--user_id",
                     required=True,
                     type=str)
 args = parser.parse_args()
+
+# TODO: remove this (only used for debugging purposes for the "f.write" calls)
+buffering = 1
 
 # need this for a higher request quota per day. See
 # https://api.stackexchange.com/docs/authentication for details
@@ -158,7 +162,7 @@ while has_more:
         # used later to query each site
         site_names.append(site_url[8:])
 
-print(f"Found {len(site_names)} Stack Exchange sites associated with user "\
+print(f"Found {len(site_names)} Stack Exchange sites associated with "\
       f"https://stackexchange.com/users/{args.user_id}")
 
 # step 3
@@ -166,6 +170,9 @@ print(f"Found {len(site_names)} Stack Exchange sites associated with user "\
 NOTE: need the "shallow_user.display_name" field to return the owner associated with
 a question or answer, since the return type is "shallow_user". If the owner is not
 returned, then this is a community wiki post.
+NOTE: for some reason, I can't request the "comment.body_markdown" field without also
+requesting the "comment.body" field. If I try to do this, I won't get the
+"comment.body_markdown" field in the response.
 """
 r = requests.get(base_url + f"filters/create",
                  params={"key":api_key,
@@ -195,6 +202,7 @@ r = requests.get(base_url + f"filters/create",
                                     "answer.down_vote_count;"\
                                     "answer.up_vote_count;"\
                                     "answer.score;"\
+                                    "comment.body;"\
                                     "comment.body_markdown;"\
                                     "comment.creation_date;"\
                                     "comment.owner;"\
@@ -252,7 +260,11 @@ def write_question(target_dir,question):
     # question title
     f.write(f"# {question['title']}\n")
     # question body
-    f.write(f"{question['body_markdown']}\n")
+    # See https://stackoverflow.com/q/2087370/13809128 for why "html.unescape" is
+    # needed.
+    f.write(html.unescape(f"{question['body_markdown']}\n"))
+    # TODO: remove this (only used for debugging)
+    # f.flush()
     # comments to the question
     # NOTE: it is safer to use the ".get" method on the dict "question" because it may
     # be the case that the 'comments' field does not exist, such as when there are
@@ -270,7 +282,7 @@ def write_question(target_dir,question):
                     f"{creation_datetime.strftime('%Y-%m-%d')} at "\
                     f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n")
         f.write(f"Comment score: {comment['score']}\n\n")
-        f.write(f"{comment['body_markdown']}\n")
+        f.write(html.unescape(f"{comment['body_markdown']}\n"))
     # answers to the question and the comments on each answer
     for i,answer in enumerate(question.get('answers',[])):
         f.write(f"## Answer {i+1}\n")
@@ -291,7 +303,7 @@ def write_question(target_dir,question):
         f.write(f"Number of up votes: {answer['up_vote_count']}\n")
         f.write(f"Number of down votes: {answer['down_vote_count']}\n")
         f.write(f"Score: {answer['score']}\n\n")
-        f.write(f"{answer['body_markdown']}\n")
+        f.write(html.unescape(f"{answer['body_markdown']}\n"))
         # comments on the answer
         for j,comment in enumerate(answer.get('comments',[])):
             f.write(f"### Comment {j+1}\n")
@@ -306,7 +318,7 @@ def write_question(target_dir,question):
                         f"{creation_datetime.strftime('%Y-%m-%d')} at "\
                         f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n")
             f.write(f"Comment score: {comment['score']}\n\n")
-            f.write(f"{comment['body_markdown']}\n")
+            f.write(html.unescape(f"{comment['body_markdown']}\n"))
     # close the file after you are done writing
     f.close()
 
