@@ -158,7 +158,7 @@ r = requests.get(base_url + f"filters/create",
                                     answer.is_accepted;\
                                     answer.down_vote_count;\
                                     answer.up_vote_count;\
-                                    answer.score:\
+                                    answer.score;\
                                     comment.body_markdown;\
                                     comment.creation_date;\
                                     comment.owner;\
@@ -181,7 +181,7 @@ answers_filter = r.json()['items'][0]['filter']
 
 # step 5
 
-# create the necessary directories (do nothing if they already exist)
+# create the top level directory and do nothing if it already exists
 top_level_dir = pathlib.Path("q_and_a")
 top_level_dir.mkdir(exist_ok=True)
 
@@ -219,6 +219,14 @@ for site_name,user_id in zip(site_names,user_ids):
         # question body
         f.write(f"{question['body_markdown']}\n")
         # comments to the question
-
+        for i,comment in enumerate(question['comments']):
+            f.write(f"### Comment {i+1}\n")
+            creation_datetime = datetime.datetime.fromtimestamp(comment['creation_date'],
+                                                                tz=datetime.timezone.utc)
+            f.write(f"Comment made by {comment['owner']['display_name']} on \
+                    {creation_datetime.strftime('%Y-%m-%d')} at \
+                    {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+            f.write(f"Comment score: {comment['score']}\n\n")
+            f.write(f"{comment['body_markdown']}\n")
         # close the file after you are done writing
         f.close()
