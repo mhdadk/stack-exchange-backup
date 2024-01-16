@@ -187,6 +187,12 @@ top_level_dir.mkdir(exist_ok=True)
 
 # iterate over the sites
 for site_name,user_id in zip(site_names,user_ids):
+    # create the directory for this site and the "questions" and "answers" directories
+    # below it
+    questions_dir = top_level_dir / site_name / "questions"
+    answers_dir = top_level_dir / site_name / "answers"
+    questions_dir.mkdir(parents=True,exist_ok=True)
+    answers_dir.mkdir(parents=True,exist_ok=True)
     # get all questions for this site
     r = requests.get(base_url + f"users/{user_id}/questions",
                      params={"key":api_key,
