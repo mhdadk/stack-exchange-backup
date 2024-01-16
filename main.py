@@ -1,6 +1,9 @@
 """
 Given a network user id <user_id>, this script downloads all questions and answers for
 the corresponding user into the following directories:
+TODO: change this so that the stack exchange sites are at the top level and the
+"questions" and "answers" folders are below them.
+
 questions
 |--- stack exchange site 1
 |---|--- question_1.md
@@ -82,6 +85,7 @@ NOTE: the access token is valid for 1 day only and changes every time you author
 import requests
 import argparse
 import pathlib
+import datetime
 
 # parse command-line arguments
 parser = argparse.ArgumentParser()
@@ -124,12 +128,18 @@ for item in r.json()['items']:
     site_names.append(site_url[8:])
 
 # step 3
+"""
+NOTE: need the "shallow_user.display_name" field to return the owner associated with
+a question or answer, since the return type is "shallow_user". If the owner is not
+returned, then this is a community wiki post.
+"""
 r = requests.get(base_url + f"filters/create",
                  params={"key":api_key,
                          "include":".items;\
                                     .has_more;\
                                     .quota_max;\
                                     .quota_remaining;\
+                                    shallow_user.display_name;\
                                     question.answers;\
                                     question.title;\
                                     question.body_markdown;\
@@ -139,7 +149,10 @@ r = requests.get(base_url + f"filters/create",
                                     question.up_vote_count;\
                                     question.score;\
                                     question.owner;\
+                                    question.link;\
+                                    question.question_id;\
                                     answer.body_markdown;\
+                                    answer.owner;\
                                     answer.comments;\
                                     answer.creation_date;\
                                     answer.is_accepted;\
@@ -169,10 +182,8 @@ answers_filter = r.json()['items'][0]['filter']
 # step 5
 
 # create the necessary directories (do nothing if they already exist)
-p = pathlib.Path(".")
-(p / "q_and_a").mkdir(exist_ok=True)
-(p / "q_and_a" / "questions").mkdir(exist_ok=True)
-(p / "q_and_a" / "answers").mkdir(exist_ok=True)
+top_level_dir = pathlib.Path("q_and_a")
+top_level_dir.mkdir(exist_ok=True)
 
 # iterate over the sites
 for site_name,user_id in zip(site_names,user_ids):
@@ -181,4 +192,27 @@ for site_name,user_id in zip(site_names,user_ids):
                      params={"key":api_key,
                              "site":site_name,
                              "filter":questions_filter})
-    print(r)
+    questions = r.json()['items']
+    for question in questions:
+        # open the file "questions_dir/<question id>.md" to write to it. Note that the
+        # <question id> can be used to contruct the URL for the question as
+        # https://<site_name>/<question id>
+        # Also, we don't use the question title as the file name because the question
+        # title can contain invalid characters (such as "$" for LaTeX). We use the
+        # question ID instead.
+        f = (questions_dir / str(question['question_id'])).with_suffix(".md").open(mode="w")
+        # question metadata
+        f.write(f"Question downloaded from {question['link']}\n")
+        creation_datetime = datetime.datetime.fromtimestamp(question['creation_date'],
+                                                            tz=datetime.timezone.utc)
+        f.write(f"Question asked by {question['owner']['display_name']} on \
+                {creation_datetime.strftime('%Y-%m-%d')} at \
+                {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+        # question title
+        f.write(f"# {question['title']}\n")
+        # question body
+        f.write(f"{question['body_markdown']}\n")
+        # comments to the question
+
+        # close the file after you are done writing
+        f.close()
