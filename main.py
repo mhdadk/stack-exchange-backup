@@ -397,4 +397,4 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
         questions = r.json()['items']
         for question in questions:
             write_question(answers_dir,question)
-    print(r)
+    print(f"Done.")
