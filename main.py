@@ -107,9 +107,6 @@ parser.add_argument("--user_id",
                     type=str)
 args = parser.parse_args()
 
-# TODO: remove this (only used for debugging purposes for the "f.write" calls)
-buffering = 1
-
 # need this for a higher request quota per day. See
 # https://api.stackexchange.com/docs/authentication for details
 api_key = "YLTVFmHkeJbm7ZIOoXstag(("
@@ -246,27 +243,27 @@ def write_question(target_dir,question):
         return
     f = fpath.open(mode="w")
     # question metadata
-    f.write(f"Question downloaded from {question['link']}\n\n")
+    f.write(f"Question downloaded from {question['link']}\\\n")
     creation_datetime = datetime.datetime.fromtimestamp(question['creation_date'],
                                                         tz=datetime.timezone.utc)
     # question may be a community wiki, in which case it has no owner
     if "owner" in question:
         f.write(f"Question asked by {question['owner']['display_name']} on "\
                 f"{creation_datetime.strftime('%Y-%m-%d')} at "\
-                f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n\n")
+                f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
     else:
         f.write(f"Question is community-owned and was asked on "\
                 f"{creation_datetime.strftime('%Y-%m-%d')} at "\
-                f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n\n")
-    f.write(f"Number of up votes: {question['up_vote_count']}\n\n")
-    f.write(f"Number of down votes: {question['down_vote_count']}\n\n")
-    f.write(f"Score: {question['score']}\n\n")
+                f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
+    f.write(f"Number of up votes: {question['up_vote_count']}\\\n")
+    f.write(f"Number of down votes: {question['down_vote_count']}\\\n")
+    f.write(f"Score: {question['score']}\n")
     # question title
-    f.write(f"# {question['title']}\n\n")
+    f.write(f"# {question['title']}\n")
     # question body
     # See https://stackoverflow.com/q/2087370/13809128 for why "html.unescape" is
     # needed.
-    f.write(html.unescape(f"{question['body_markdown']}\n\n"))
+    f.write(html.unescape(f"{question['body_markdown']}\n"))
     # TODO: remove this (only used for debugging)
     # f.flush()
     # comments to the question
@@ -280,13 +277,13 @@ def write_question(target_dir,question):
         if "owner" in comment:
             f.write(f"Comment made by {comment['owner']['display_name']} on "\
                     f"{creation_datetime.strftime('%Y-%m-%d')} at "\
-                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n\n")
+                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
         else:
             f.write(f"Comment made anonymously and was asked on "\
                     f"{creation_datetime.strftime('%Y-%m-%d')} at "\
-                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n\n")
+                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
         f.write(f"Comment score: {comment['score']}\n\n")
-        f.write(html.unescape(f"{comment['body_markdown']}\n\n"))
+        f.write(html.unescape(f"{comment['body_markdown']}\n"))
     # answers to the question and the comments on each answer
     for i,answer in enumerate(question.get('answers',[])):
         f.write(f"## Answer {i+1}\n")
@@ -295,19 +292,19 @@ def write_question(target_dir,question):
         if "owner" in answer:
             f.write(f"Answer by {answer['owner']['display_name']} on "\
                     f"{creation_datetime.strftime('%Y-%m-%d')} at "\
-                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n\n")
+                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
         else:
             f.write(f"Anonymous answer that was created on "\
                     f"{creation_datetime.strftime('%Y-%m-%d')} at "\
-                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n\n")
+                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
         if answer['is_accepted']:
-            f.write("This is the accepted answer.\n\n")
+            f.write("This is the accepted answer.\\\n")
         else:
-            f.write("This is not the accepted answer.\n\n")
-        f.write(f"Number of up votes: {answer['up_vote_count']}\n\n")
-        f.write(f"Number of down votes: {answer['down_vote_count']}\n\n")
+            f.write("This is not the accepted answer.\\\n")
+        f.write(f"Number of up votes: {answer['up_vote_count']}\\\n")
+        f.write(f"Number of down votes: {answer['down_vote_count']}\\\n")
         f.write(f"Score: {answer['score']}\n\n")
-        f.write(html.unescape(f"{answer['body_markdown']}\n\n"))
+        f.write(html.unescape(f"{answer['body_markdown']}\n"))
         # comments on the answer
         for j,comment in enumerate(answer.get('comments',[])):
             f.write(f"### Comment {j+1}\n")
@@ -316,13 +313,13 @@ def write_question(target_dir,question):
             if "owner" in comment:
                 f.write(f"Comment made by {comment['owner']['display_name']} on "\
                         f"{creation_datetime.strftime('%Y-%m-%d')} at "\
-                        f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n\n")
+                        f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
             else:
                 f.write(f"Comment made anonymously and was asked on "\
                         f"{creation_datetime.strftime('%Y-%m-%d')} at "\
-                        f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n\n")
+                        f"{creation_datetime.strftime('%H:%M:%S')} UTC.\\\n")
             f.write(f"Comment score: {comment['score']}\n\n")
-            f.write(html.unescape(f"{comment['body_markdown']}\n\n"))
+            f.write(html.unescape(f"{comment['body_markdown']}\n"))
     # close the file after you are done writing
     f.close()
 
