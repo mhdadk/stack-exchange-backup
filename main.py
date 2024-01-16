@@ -119,7 +119,7 @@ r = requests.get(base_url + f"filters/create",
                          "include":".items;"\
                                    ".has_more;"\
                                    ".page;"\
-                                   ".pagesize;"\
+                                   ".page_size;"\
                                    ".quota_max;"\
                                    ".quota_remaining;"\
                                    "network_user.site_url;"\
@@ -158,7 +158,8 @@ while has_more:
         # used later to query each site
         site_names.append(site_url[8:])
 
-print(f"Found {len(site_names)} sites associated with network user {args.user_id}.")
+print(f"Found {len(site_names)} Stack Exchange sites associated with user "\
+      f"https://stackexchange.com/users/{args.user_id}")
 
 # step 3
 """
@@ -171,7 +172,7 @@ r = requests.get(base_url + f"filters/create",
                          "include":".items;"\
                                     ".has_more;"\
                                     ".page;"\
-                                    ".pagesize;"\
+                                    ".page_size;"\
                                     ".quota_max;"\
                                     ".quota_remaining;"\
                                     "shallow_user.display_name;"\
@@ -208,7 +209,7 @@ r = requests.get(base_url + f"filters/create",
                          "include":".items;"\
                                    ".has_more;"\
                                    ".page;"\
-                                   ".pagesize;"\
+                                   ".page_size;"\
                                    ".quota_max;"\
                                    ".quota_remaining;"\
                                    "answer.question_id",
@@ -229,6 +230,8 @@ def write_question(target_dir,question):
     # Also, we don't use the question title as the file name because the question
     # title can contain invalid characters (such as "$" for LaTeX). We use the
     # question ID instead.
+    # NOTE: we are assuming that question IDs for each site are unique, so there is no
+    # need to deliberately avoid overwriting
     f = (target_dir / str(question['question_id'])).with_suffix(".md").open(mode="w")
     # question metadata
     f.write(f"Question downloaded from {question['link']}\n")
