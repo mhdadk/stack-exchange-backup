@@ -214,6 +214,7 @@ for site_name,user_id in zip(site_names,user_ids):
         f.write(f"Question asked by {question['owner']['display_name']} on \
                 {creation_datetime.strftime('%Y-%m-%d')} at \
                 {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+        # TODO: add question score and other metadata here
         # question title
         f.write(f"# {question['title']}\n")
         # question body
