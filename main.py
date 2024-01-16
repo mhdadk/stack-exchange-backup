@@ -116,14 +116,14 @@ base_url = "https://api.stackexchange.com/2.3/"
 # step 1
 r = requests.get(base_url + f"filters/create",
                  params={"key":api_key,
-                         "include":".items;\
-                                    .has_more;\
-                                    .page;\
-                                    .pagesize;\
-                                    .quota_max;\
-                                    .quota_remaining;\
-                                    network_user.site_url;\
-                                    network_user.user_id",
+                         "include":".items;"\
+                                   ".has_more;"\
+                                   ".page;"\
+                                   ".pagesize;"\
+                                   ".quota_max;"\
+                                   ".quota_remaining;"\
+                                   "network_user.site_url;"\
+                                   "network_user.user_id",
                          "base":"none",
                          "unsafe":"false"})
 network_users_filter = r.json()['items'][0]['filter']
@@ -168,34 +168,34 @@ returned, then this is a community wiki post.
 """
 r = requests.get(base_url + f"filters/create",
                  params={"key":api_key,
-                         "include":".items;\
-                                    .has_more;\
-                                    .quota_max;\
-                                    .quota_remaining;\
-                                    shallow_user.display_name;\
-                                    question.answers;\
-                                    question.title;\
-                                    question.body_markdown;\
-                                    question.comments;\
-                                    question.creation_date;\
-                                    question.down_vote_count;\
-                                    question.up_vote_count;\
-                                    question.score;\
-                                    question.owner;\
-                                    question.link;\
-                                    question.question_id;\
-                                    answer.body_markdown;\
-                                    answer.owner;\
-                                    answer.comments;\
-                                    answer.creation_date;\
-                                    answer.is_accepted;\
-                                    answer.down_vote_count;\
-                                    answer.up_vote_count;\
-                                    answer.score;\
-                                    comment.body_markdown;\
-                                    comment.creation_date;\
-                                    comment.owner;\
-                                    comment.score",
+                         "include":".items;"\
+                                    ".has_more;"\
+                                    ".quota_max;"\
+                                    ".quota_remaining;"\
+                                    "shallow_user.display_name;"\
+                                    "question.answers;"\
+                                    "question.title;"\
+                                    "question.body_markdown;"\
+                                    "question.comments;"\
+                                    "question.creation_date;"\
+                                    "question.down_vote_count;"\
+                                    "question.up_vote_count;"\
+                                    "question.score;"\
+                                    "question.owner;"\
+                                    "question.link;"\
+                                    "question.question_id;"\
+                                    "answer.body_markdown;"\
+                                    "answer.owner;"\
+                                    "answer.comments;"\
+                                    "answer.creation_date;"\
+                                    "answer.is_accepted;"\
+                                    "answer.down_vote_count;"\
+                                    "answer.up_vote_count;"\
+                                    "answer.score;"\
+                                    "comment.body_markdown;"\
+                                    "comment.creation_date;"\
+                                    "comment.owner;"\
+                                    "comment.score",
                          "base":"none",
                          "unsafe":"false"})
 questions_filter = r.json()['items'][0]['filter']
@@ -203,11 +203,11 @@ questions_filter = r.json()['items'][0]['filter']
 # step 4
 r = requests.get(base_url + f"filters/create",
                  params={"key":api_key,
-                         "include":".items;\
-                                    .has_more;\
-                                    .quota_max;\
-                                    .quota_remaining;\
-                                    answer.question_id",
+                         "include":".items;"\
+                                   ".has_more;"\
+                                   ".quota_max;"\
+                                   ".quota_remaining;"\
+                                   "answer.question_id",
                          "base":"none",
                          "unsafe":"false"})
 answers_filter = r.json()['items'][0]['filter']
@@ -232,13 +232,13 @@ def write_question(target_dir,question):
                                                         tz=datetime.timezone.utc)
     # question may be a community wiki, in which case it has no owner
     if "owner" in question:
-        f.write(f"Question asked by {question['owner']['display_name']} on \
-                    {creation_datetime.strftime('%Y-%m-%d')} at \
-                    {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+        f.write(f"Question asked by {question['owner']['display_name']} on "\
+                f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n")
     else:
-        f.write(f"Question is community-owned and was asked on \
-                    {creation_datetime.strftime('%Y-%m-%d')} at \
-                    {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+        f.write(f"Question is community-owned and was asked on "\
+                f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n")
     f.write(f"Number of up votes: {question['up_vote_count']}\n")
     f.write(f"Number of down votes: {question['down_vote_count']}\n")
     f.write(f"Score: {question['score']}\n")
