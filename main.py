@@ -170,6 +170,8 @@ r = requests.get(base_url + f"filters/create",
                  params={"key":api_key,
                          "include":".items;"\
                                     ".has_more;"\
+                                    ".page;"\
+                                    ".pagesize;"\
                                     ".quota_max;"\
                                     ".quota_remaining;"\
                                     "shallow_user.display_name;"\
@@ -205,6 +207,8 @@ r = requests.get(base_url + f"filters/create",
                  params={"key":api_key,
                          "include":".items;"\
                                    ".has_more;"\
+                                   ".page;"\
+                                   ".pagesize;"\
                                    ".quota_max;"\
                                    ".quota_remaining;"\
                                    "answer.question_id",
@@ -255,13 +259,13 @@ def write_question(target_dir,question):
         creation_datetime = datetime.datetime.fromtimestamp(comment['creation_date'],
                                                             tz=datetime.timezone.utc)
         if "owner" in comment:
-            f.write(f"Comment made by {comment['owner']['display_name']} on \
-                    {creation_datetime.strftime('%Y-%m-%d')} at \
-                    {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+            f.write(f"Comment made by {comment['owner']['display_name']} on "\
+                    f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n")
         else:
-            f.write(f"Comment made anonymously and was asked on \
-                    {creation_datetime.strftime('%Y-%m-%d')} at \
-                    {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+            f.write(f"Comment made anonymously and was asked on "\
+                    f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n")
         f.write(f"Comment score: {comment['score']}\n\n")
         f.write(f"{comment['body_markdown']}\n")
     # answers to the question and the comments on each answer
@@ -270,13 +274,13 @@ def write_question(target_dir,question):
         creation_datetime = datetime.datetime.fromtimestamp(answer['creation_date'],
                                                             tz=datetime.timezone.utc)
         if "owner" in answer:
-            f.write(f"Answer by {answer['owner']['display_name']} on \
-                    {creation_datetime.strftime('%Y-%m-%d')} at \
-                    {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+            f.write(f"Answer by {answer['owner']['display_name']} on "\
+                    f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n")
         else:
-            f.write(f"Anonymous answer that was created on \
-                    {creation_datetime.strftime('%Y-%m-%d')} at \
-                    {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+            f.write(f"Anonymous answer that was created on "\
+                    f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                    f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n")
         if answer['is_accepted']:
             f.write("This is the accepted answer.\n")
         else:
@@ -291,13 +295,13 @@ def write_question(target_dir,question):
             creation_datetime = datetime.datetime.fromtimestamp(comment['creation_date'],
                                                                 tz=datetime.timezone.utc)
             if "owner" in comment:
-                f.write(f"Comment made by {comment['owner']['display_name']} on \
-                        {creation_datetime.strftime('%Y-%m-%d')} at \
-                        {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+                f.write(f"Comment made by {comment['owner']['display_name']} on "\
+                        f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                        f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n")
             else:
-                f.write(f"Comment made anonymously and was asked on \
-                        {creation_datetime.strftime('%Y-%m-%d')} at \
-                        {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+                f.write(f"Comment made anonymously and was asked on "\
+                        f"{creation_datetime.strftime('%Y-%m-%d')} at "\
+                        f"{creation_datetime.strftime('%H:%M:%S')} UTC.\n")
             f.write(f"Comment score: {comment['score']}\n\n")
             f.write(f"{comment['body_markdown']}\n")
     # close the file after you are done writing
@@ -305,8 +309,8 @@ def write_question(target_dir,question):
 
 # iterate over the sites
 for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
-    print(f"Downloading and writing questions from site \
-          {i+1}/{len(site_names)} ({site_name})...",end="")
+    print(f"Downloading and writing questions from site "\
+          f"{i+1}/{len(site_names)} ({site_name})...",end="")
     # create the "questions" directory for this site
     questions_dir = top_level_dir / site_name / "questions"
     questions_dir.mkdir(parents=True,exist_ok=True)
@@ -321,40 +325,60 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
     this property was set to "1" for the first page. See
     https://api.stackexchange.com/docs/wrapper for details. 
     """
-    # get all questions for this site
-    r = requests.get(base_url + f"users/{user_id}/questions",
-                     params={"key":api_key,
-                             "site":site_name,
-                             "filter":questions_filter})
-    questions = r.json()['items']
-    for question in questions:
-        write_question(questions_dir,question)
+    has_more = True
+    page_num = 0
+    while has_more:
+        if has_more:
+            page_num += 1
+        r = requests.get(base_url + f"users/{user_id}/questions",
+                        params={"key":api_key,
+                                "site":site_name,
+                                "filter":questions_filter,
+                                "page":str(page_num),
+                                "pagesize":"100"})
+        data = r.json()
+        has_more = data['has_more']
+        questions = data['items']
+        for question in questions:
+            write_question(questions_dir,question)
     print(f"Done.")
-    print(f"Downloading and writing answers from site \
-          {i+1}/{len(site_names)} ({site_name})...",end="")
+    print(f"Downloading and writing answers from site "\
+          f"{i+1}/{len(site_names)} ({site_name})...",end="")
     # create the "answers" directory for this site
     answers_dir = top_level_dir / site_name / "answers"
     answers_dir.mkdir(parents=True,exist_ok=True)
     # get all answers for this site
-    r = requests.get(base_url + f"users/{user_id}/answers",
-                     params={"key":api_key,
-                             "site":site_name,
-                             "filter":answers_filter})
-    answers = r.json()['items']
-    # extract the question IDs and put them into a query string
-    question_ids = ""
-    for i,answer in enumerate(answers):
-        question_ids += f"{answer['question_id']}"
-        # don't put a semicolon at the end of the query string
-        if i < len(answers) - 1:
-            question_ids += ";"
-    # get all the questions associated with these answers
-    r = requests.get(base_url + f"questions/{question_ids}",
-                     params={"key":api_key,
-                             "site":site_name,
-                             "filter":questions_filter})
-    questions = r.json()['items']
-    for question in questions:
-        write_question(questions_dir,question)
-
+    has_more = True
+    page_num = 0
+    while has_more:
+        if has_more:
+            page_num += 1
+        r = requests.get(base_url + f"users/{user_id}/answers",
+                        params={"key":api_key,
+                                "site":site_name,
+                                "filter":answers_filter,
+                                "page":str(page_num),
+                                "pagesize":"100"})
+        data = r.json()
+        has_more = data['has_more']
+        answers = data['items']
+        # extract the question IDs and put them into a query string
+        question_ids = ""
+        for i,answer in enumerate(answers):
+            question_ids += f"{answer['question_id']}"
+            # don't put a semicolon at the end of the query string as this will throw
+            # an error
+            if i < len(answers) - 1:
+                question_ids += ";"
+        # get all the questions associated with these answers. Since there will always
+        # be a maximum of 100 answers, then there will always be 100 questions, and
+        # so we don't need to iterate through pages here
+        r = requests.get(base_url + f"questions/{question_ids}",
+                        params={"key":api_key,
+                                "site":site_name,
+                                "filter":questions_filter,
+                                "pagesize":"100"})
+        questions = r.json()['items']
+        for question in questions:
+            write_question(answers_dir,question)
     print(r)
