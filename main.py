@@ -159,6 +159,7 @@ r = requests.get(base_url + f"filters/create",
                                     answer.down_vote_count;\
                                     answer.up_vote_count;\
                                     answer.score;\
+                                    answer.question_id;\
                                     comment.body_markdown;\
                                     comment.creation_date;\
                                     comment.owner;\
@@ -187,12 +188,10 @@ top_level_dir.mkdir(exist_ok=True)
 
 # iterate over the sites
 for site_name,user_id in zip(site_names,user_ids):
-    # create the directory for this site and the "questions" and "answers" directories
-    # below it
+    print(f"Downloading and writing questions from {site_name}...",end="")
+    # create the "questions" directory for this site
     questions_dir = top_level_dir / site_name / "questions"
-    answers_dir = top_level_dir / site_name / "answers"
     questions_dir.mkdir(parents=True,exist_ok=True)
-    answers_dir.mkdir(parents=True,exist_ok=True)
     # get all questions for this site
     r = requests.get(base_url + f"users/{user_id}/questions",
                      params={"key":api_key,
@@ -211,23 +210,85 @@ for site_name,user_id in zip(site_names,user_ids):
         f.write(f"Question downloaded from {question['link']}\n")
         creation_datetime = datetime.datetime.fromtimestamp(question['creation_date'],
                                                             tz=datetime.timezone.utc)
-        f.write(f"Question asked by {question['owner']['display_name']} on \
-                {creation_datetime.strftime('%Y-%m-%d')} at \
-                {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
-        # TODO: add question score and other metadata here
+        # question may be a community wiki, in which case it has no owner
+        if "owner" in question:
+            f.write(f"Question asked by {question['owner']['display_name']} on \
+                      {creation_datetime.strftime('%Y-%m-%d')} at \
+                      {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+        else:
+            f.write(f"Question is community-owned and was asked on \
+                      {creation_datetime.strftime('%Y-%m-%d')} at \
+                      {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+        f.write(f"Number of up votes: {question['up_vote_count']}\n")
+        f.write(f"Number of down votes: {question['down_vote_count']}\n")
+        f.write(f"Score: {question['score']}\n")
         # question title
         f.write(f"# {question['title']}\n")
         # question body
         f.write(f"{question['body_markdown']}\n")
         # comments to the question
-        for i,comment in enumerate(question['comments']):
+        # NOTE: it is safer to use the ".get" method on the dict "question" because it may
+        # be the case that the 'comments' field does not exist, such as when there are
+        # no comments on the question
+        for i,comment in enumerate(question.get('comments',[])):
             f.write(f"### Comment {i+1}\n")
             creation_datetime = datetime.datetime.fromtimestamp(comment['creation_date'],
                                                                 tz=datetime.timezone.utc)
-            f.write(f"Comment made by {comment['owner']['display_name']} on \
-                    {creation_datetime.strftime('%Y-%m-%d')} at \
-                    {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+            if "owner" in comment:
+                f.write(f"Comment made by {comment['owner']['display_name']} on \
+                        {creation_datetime.strftime('%Y-%m-%d')} at \
+                        {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+            else:
+                f.write(f"Comment made anonymously and was asked on \
+                        {creation_datetime.strftime('%Y-%m-%d')} at \
+                        {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
             f.write(f"Comment score: {comment['score']}\n\n")
             f.write(f"{comment['body_markdown']}\n")
+        # answers to the question and the comments on each answer
+        for i,answer in enumerate(question.get('answers',[])):
+            f.write(f"## Answer {i+1}\n")
+            creation_datetime = datetime.datetime.fromtimestamp(answer['creation_date'],
+                                                                tz=datetime.timezone.utc)
+            if "owner" in answer:
+                f.write(f"Answer by {answer['owner']['display_name']} on \
+                        {creation_datetime.strftime('%Y-%m-%d')} at \
+                        {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+            else:
+                f.write(f"Anonymous answer that was created on \
+                        {creation_datetime.strftime('%Y-%m-%d')} at \
+                        {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+            if answer['is_accepted']:
+                f.write("This is the accepted answer.\n")
+            else:
+                f.write("This is not the accepted answer.\n")
+            f.write(f"Number of up votes: {answer['up_vote_count']}\n")
+            f.write(f"Number of down votes: {answer['down_vote_count']}\n")
+            f.write(f"Score: {answer['score']}\n\n")
+            f.write(f"{answer['body_markdown']}\n")
+            # comments on the answer
+            for j,comment in enumerate(answer.get('comments',[])):
+                f.write(f"### Comment {j+1}\n")
+                creation_datetime = datetime.datetime.fromtimestamp(comment['creation_date'],
+                                                                    tz=datetime.timezone.utc)
+                if "owner" in comment:
+                    f.write(f"Comment made by {comment['owner']['display_name']} on \
+                            {creation_datetime.strftime('%Y-%m-%d')} at \
+                            {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+                else:
+                    f.write(f"Comment made anonymously and was asked on \
+                            {creation_datetime.strftime('%Y-%m-%d')} at \
+                            {creation_datetime.strftime('%H:%M:%S')} UTC.\n")
+                f.write(f"Comment score: {comment['score']}\n\n")
+                f.write(f"{comment['body_markdown']}\n")
         # close the file after you are done writing
         f.close()
+    print(f"Done.")
+    # create the "answers" directory for this site
+    answers_dir = top_level_dir / site_name / "answers"
+    answers_dir.mkdir(parents=True,exist_ok=True)
+    # get all answers for this site
+    r = requests.get(base_url + f"users/{user_id}/answers",
+                     params={"key":api_key,
+                             "site":site_name,
+                             "filter":questions_filter})
+    questions = r.json()['items']
