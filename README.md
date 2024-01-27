@@ -148,7 +148,7 @@ See the "Logic" section below for an overview of how the `main.py` file works.
 # Logic
 
 This section is intended for anyone interested in how the `main.py` file works, and is
-optional reading. The following steps are added as comments (as `#%% step X``) inside
+optional reading. The following steps are added as comments (as `#%% step X`) inside
 the `main.py` file to indicate which part of the file corresponds to which step below.
 
 The `main.py` script proceeds as follows:
@@ -179,8 +179,20 @@ user ID and the corresponding site ID associated with each site.
 
 # Alternatives
 
-Although there are alternative ways of doing this,
-such as using [`stackapi`](https://github.com/AWegnerGitHub/stackapi) and the stack
-exchange data explorer, this method uses
-only 1 dependency: the `requests` package. This minimizes the risk of obscelesence in
-the future.
+There are alternative ways of downloading all your questions and answers from each SE
+site:
+
+## `stackapi`
+
+There exists a Python API for the SE API called [`stackapi`](https://github.com/AWegnerGitHub/stackapi)
+that is built on top of the `requests` package. Although this API provides a nice
+interface to the SE API, my goal here was to use as few dependencies as possible to
+lower the risk of obscelesence later on.
+
+## Stack Exchange data explorer
+
+The [SE data explorer](https://data.stackexchange.com/) provides another way of obtaining
+a copy of all your questions and answers across all SE sites, via [this query](https://data.stackexchange.com/stackoverflow/query/1811712/all-my-posts-on-the-se-network-with-markdown-and-html-content-plus-editors-and-s) for example. However,
+this query only returns a CSV folder, from which the relevant content will need to be
+parsed and then written into Markdown files. Additionally, I am personally not familiar
+with SQL, so I preferred the approach used in the `main.py` file.
