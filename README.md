@@ -64,7 +64,13 @@ where
 * `<question id associated with answer n id>` is the question ID associated with the `n`th answer for the parent SE site.
 
 The `q_and_a` directory will contain Markdown files with the extension `.md`. Each Markdown
-file will have the following format:
+file will represent either a question or an answer, depending on whether it is under a
+`questions` directory or an `answers` directory. If the Markdown file represents a
+question, then the question creator will be you. Otherwise, if the Markdown file
+represents an answer, the question creator will not be you, but the creator of one of
+the answers included in the Markdown file will be you. More specifically, each Markdown
+file will have the following format (text that is inside angle brackets, such as `<this>`,
+represents text that will vary for each Markdown file):
 ```markdown
 Question downloaded from <question link>
 Question asked by <user name for question creator> on <question date> at <question time>.
@@ -86,7 +92,7 @@ Comment score: <number of up votes for comment 1 for the question>
 Comment made by <user name for creator of comment n for the question> on <comment n date> at <comment n time>.
 Comment score: <number of up votes for comment n for the question>
 
-<comment n body>
+<comment n for the question body>
 
 ## Answer 1
 Answer by <user name for creator of answer 1> on <answer 1 date> at <answer 1 time>.
@@ -98,17 +104,70 @@ Score: <overall score associated with answer 1 (number of up votes - number of d
 <answer 1 body>
 
 ### Comment 1
-Comment made by <user name for creator comment 1 for answer 1> on <comment 1 date> at <comment 1 time>.\
-Comment score: 0
+Comment made by <user name for creator comment 1 for answer 1> on <comment 1 date> at <comment 1 time>.
+Comment score: <number of up votes for comment 1 for answer 1>
 
-Could you explain in a bit more detail what this means? Maybe provide an example?
+<comment 1 for answer 1 body>
+
+...
+
+### Comment n
+Comment made by <user name for creator comment n for answer 1> on <comment n date> at <comment n time>.
+Comment score: <number of up votes for comment n for answer 1>
+
+<comment n for answer 1 body>
+
+...
+
+## Answer m
+Answer by <user name for creator of answer m> on <answer m date> at <answer m time>.
+This <is/is not> the accepted answer. <indicates whether this is the accepted answer or not>
+Number of up votes: <number of up votes for answer m>
+Number of down votes: <number of down votes for answer m>
+Score: <overall score associated with answer m (number of up votes - number of down votes)>
+
+<answer m body>
+
+### Comment 1
+Comment made by <user name for creator comment 1 for answer m> on <comment 1 date> at <comment 1 time>.
+Comment score: <number of up votes for comment 1 for answer m>
+
+<comment 1 for answer m body>
+
+...
+
+### Comment n
+Comment made by <user name for creator comment n for answer m> on <comment n date> at <comment n time>.
+Comment score: <number of up votes for comment n for answer m>
+
+<comment n for answer m body>
 ```
 
-See the "Logic" section below for an overview of how the `main.py` file works. 
+See the "Logic" section below for an overview of how the `main.py` file works.
 
 # Logic
 
-This section is intended for anyone interested in how the `main.py` file works, and is completely optional.
+This section is intended for anyone interested in how the `main.py` file works, and is
+optional reading. The following steps are added as comments (as `#%% step X``) inside
+the `main.py` file to indicate which part of the file corresponds to which step below.
+
+The `main.py` script proceeds as follows:
+1. Given a network user ID, obtain the names of all the SE sites associated with this
+user ID and the corresponding site ID associated with each site.
+2. Create the top-level directory `q_and_a`.
+3. For each SE site obtained in step 1:
+
+    (a) Create the `questions` directory for this SE site.
+
+    (b) Get all questions associated with this user on this SE site.
+
+    (c) For each question associated with this user on this SE site, write the contents
+    of the question, its comments, the answers, and their comments into a Markdown file
+    using the format mentioned in the "Format" section above.
+
+    (d) Create the `answers` directory for this SE site.
+
+    (e)
 
 
 

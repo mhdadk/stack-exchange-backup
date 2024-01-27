@@ -114,7 +114,7 @@ api_key = "YLTVFmHkeJbm7ZIOoXstag(("
 # this must appear before every request
 base_url = "https://api.stackexchange.com/2.3/"
 
-# step 1
+#%% step 1
 r = requests.get(base_url + f"filters/create",
                  params={"key":api_key,
                          "include":".items;"\
@@ -129,7 +129,6 @@ r = requests.get(base_url + f"filters/create",
                          "unsafe":"false"})
 network_users_filter = r.json()['items'][0]['filter']
 
-# step 2
 has_more = True
 page_num = 0
 site_names = []
@@ -162,7 +161,6 @@ while has_more:
 print(f"Found {len(site_names)} Stack Exchange sites associated with "\
       f"https://stackexchange.com/users/{args.user_id}")
 
-# step 3
 """
 NOTE: need the "shallow_user.display_name" field to return the owner associated with
 a question or answer, since the return type is "shallow_user". If the owner is not
@@ -208,7 +206,6 @@ r = requests.get(base_url + f"filters/create",
                          "unsafe":"false"})
 questions_filter = r.json()['items'][0]['filter']
 
-# step 4
 r = requests.get(base_url + f"filters/create",
                  params={"key":api_key,
                          "include":".items;"\
@@ -222,8 +219,7 @@ r = requests.get(base_url + f"filters/create",
                          "unsafe":"false"})
 answers_filter = r.json()['items'][0]['filter']
 
-# step 5
-
+#%% step 2
 # create the top level directory and do nothing if it already exists
 top_level_dir = pathlib.Path("q_and_a")
 top_level_dir.mkdir(exist_ok=True)
@@ -349,11 +345,11 @@ def write_question(target_dir,question):
 for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
     print(f"Downloading and writing questions from site "\
           f"{i+1}/{len(site_names)} ({site_name})...",end="",flush=True)
+    #%% step 3a
     # create the "questions" directory for this site
     questions_dir = top_level_dir / site_name / "questions"
     questions_dir.mkdir(parents=True,exist_ok=True)
     """
-    get all questions for this site
     NOTE: According to https://api.stackexchange.com/docs/paging, each response will
     have a maximum number of 100 items (the "pagesize" parameter) under the "items"
     field. Therefore, if there are more than 100 questions, we will need to process
@@ -368,6 +364,7 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
     while has_more:
         if has_more:
             page_num += 1
+        #%% step 3b
         r = requests.get(base_url + f"users/{user_id}/questions",
                         params={"key":api_key,
                                 "site":site_name,
@@ -377,6 +374,7 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
         data = r.json()
         has_more = data['has_more']
         questions = data['items']
+        #%% step 3c
         # NOTE: if there are no questions associated with this site, then "questions"
         # will be an empty list, such that the following for loop will be skipped.
         for question in questions:
@@ -384,6 +382,7 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
     print(f"Done.")
     print(f"Downloading and writing answers from site "\
           f"{i+1}/{len(site_names)} ({site_name})...",end="",flush=True)
+    #%% step 3d
     # create the "answers" directory for this site
     answers_dir = top_level_dir / site_name / "answers"
     answers_dir.mkdir(parents=True,exist_ok=True)
