@@ -24,6 +24,8 @@ Finally, determine your SE network user ID by doing the following:
 4. Go to the address bar in your browser, and the address should be in the form `https://stackexchange.com/users/<user id>/<user name>`. For example, the screenshot below shows my `user id` as `9073934` and my `user name` as `mhdadk`. Note/save the `user id` from the address bar that is shown for your account, as this will be needed later. 
 ![](assets/address_bar_userid.png)
 
+Go to the "Usage" section below for the next step.
+
 # Usage
 
 Once the steps under the section "Getting started" above are done, you can then download all of your questions and answers from all SE sites by running the following command:
