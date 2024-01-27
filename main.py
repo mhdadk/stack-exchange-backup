@@ -377,6 +377,8 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
         data = r.json()
         has_more = data['has_more']
         questions = data['items']
+        # NOTE: if there are no questions associated with this site, then "questions"
+        # will be an empty list, such that the following for loop will be skipped.
         for question in questions:
             write_question(questions_dir,question)
     print(f"Done.")
@@ -385,7 +387,7 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
     # create the "answers" directory for this site
     answers_dir = top_level_dir / site_name / "answers"
     answers_dir.mkdir(parents=True,exist_ok=True)
-    # get all answers for this site
+    # get all answers for this user for this site
     has_more = True
     page_num = 0
     while has_more:
@@ -408,15 +410,17 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
             # an error
             if i < len(answers) - 1:
                 question_ids += ";"
-        # get all the questions associated with these answers. Since there will always
-        # be a maximum of 100 answers, then there will always be 100 questions, and
-        # so we don't need to iterate through pages here
-        r = requests.get(base_url + f"questions/{question_ids}",
-                        params={"key":api_key,
-                                "site":site_name,
-                                "filter":questions_filter,
-                                "pagesize":"100"})
-        questions = r.json()['items']
-        for question in questions:
-            write_question(answers_dir,question)
+        # in case there are no answers associated with this site, skip it
+        if len(answers) > 0:
+            # get all the questions associated with these answers. Since there will always
+            # be a maximum of 100 answers, then there will always be 100 questions, and
+            # so we don't need to iterate through pages here
+            r = requests.get(base_url + f"questions/{question_ids}",
+                            params={"key":api_key,
+                                    "site":site_name,
+                                    "filter":questions_filter,
+                                    "pagesize":"100"})
+            questions = r.json()['items']
+            for question in questions:
+                write_question(answers_dir,question)
     print(f"Done.")
