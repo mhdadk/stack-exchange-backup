@@ -34,9 +34,7 @@ python main.py --user_id <user id>
 ```
 where `<user id>` should be replaced with your own `user id` that you obtained by following the instructions under the "Getting started" section above.
 
-# How does it work?
-
-## Format
+# Format
 
 Once the commnand under the "Usage" section is run, a `q_and_a` directory will be created inside the directory from which the command was run. This directory will have the following structure:
 ```bash
@@ -65,7 +63,13 @@ where
 * `<question n id>` is the question ID associated with `n`th question for the parent SE site.
 * `<question id associated with answer n id>` is the question ID associated with the `n`th answer for the parent SE site.
 
-## Logic
+See the "Logic" section below for an overview of how the `main.py` file works. 
+
+# Logic
+
+This section is intended for anyone interested in how the `main.py` file works, and is completely optional.
+
+
 
 # Alternatives
 
