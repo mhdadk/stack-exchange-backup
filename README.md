@@ -32,11 +32,11 @@ Once the steps under the section "Getting started" above are done, you can then 
 ```powershell
 python main.py --user_id <user id>
 ```
-where `<user id>` should be replaced with your own `user id` that you obtained by following the instructions under the "Getting started" section above.
+where `<user id>` should be replaced with your own `user id` that you obtained by following the instructions under the "Getting started" section above. See the "Format" section below for details on the format of the files that are downloaded.
 
 # Format
 
-Once the commnand under the "Usage" section is run, a `q_and_a` directory will be created inside the directory from which the command was run. This directory will have the following structure:
+Once the command under the "Usage" section is run, a `q_and_a` directory will be created inside the directory from which the command was run. This directory will have the following structure:
 ```bash
 <stack exchange site 1>.com
 |--- questions
@@ -62,6 +62,47 @@ where
 * `<stack exchange site n>` is the name for the `n`th SE site associated with a user.
 * `<question n id>` is the question ID associated with `n`th question for the parent SE site.
 * `<question id associated with answer n id>` is the question ID associated with the `n`th answer for the parent SE site.
+
+The `q_and_a` directory will contain Markdown files with the extension `.md`. Each Markdown
+file will have the following format:
+```markdown
+Question downloaded from <question link>
+Question asked by <user name for question creator> on <question date> at <question time>.
+Number of up votes: <number of up votes for question>
+Number of down votes: <number of down votes for question>
+Score: <overall score associated with the question (number of up votes - number of down votes)>
+# <question title>
+<question body>
+
+### Comment 1
+Comment made by <user name for creator of comment 1 for the question> on <comment 1 date> at <comment 1 time>.
+Comment score: <number of up votes for comment 1 for the question>
+
+<comment 1 body>
+
+...
+
+### Comment n
+Comment made by <user name for creator of comment n for the question> on <comment n date> at <comment n time>.
+Comment score: <number of up votes for comment n for the question>
+
+<comment n body>
+
+## Answer 1
+Answer by <user name for creator of answer 1> on <answer 1 date> at <answer 1 time>.
+This <is/is not> the accepted answer. <indicates whether this is the accepted answer or not>
+Number of up votes: <number of up votes for answer 1>
+Number of down votes: <number of down votes for answer 1>
+Score: <overall score associated with answer 1 (number of up votes - number of down votes)>
+
+<answer 1 body>
+
+### Comment 1
+Comment made by <user name for creator comment 1 for answer 1> on <comment 1 date> at <comment 1 time>.\
+Comment score: 0
+
+Could you explain in a bit more detail what this means? Maybe provide an example?
+```
 
 See the "Logic" section below for an overview of how the `main.py` file works. 
 
