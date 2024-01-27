@@ -193,6 +193,6 @@ lower the risk of obscelesence later on.
 
 The [SE data explorer](https://data.stackexchange.com/) provides another way of obtaining
 a copy of all your questions and answers across all SE sites, via [this query](https://data.stackexchange.com/stackoverflow/query/1811712/all-my-posts-on-the-se-network-with-markdown-and-html-content-plus-editors-and-s) for example. However,
-this query only returns a CSV folder, from which the relevant content will need to be
-parsed and then written into Markdown files. Additionally, I am personally not familiar
+this query only returns a CSV file, from which the relevant content will need to be
+parsed and then written to Markdown files. Additionally, I am personally not familiar
 with SQL, so I preferred the approach used in the `main.py` file.
