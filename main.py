@@ -1,98 +1,3 @@
-"""
-Given a network user id <user_id>, this script downloads all questions and answers for
-the corresponding user into the following directories:
-TODO: change this so that the stack exchange sites are at the top level and the
-"questions" and "answers" folders are below them.
-
-questions
-|--- stack exchange site 1
-|---|--- question_1.md
-|---|--- question_2.md
-|---|--- ...
-|--- stack exchange site 2
-|---|--- question_1.md
-|---|--- question_2.md
-|---|--- ...
-answers
-|--- stack exchange site 1
-|---|--- answer_1.md
-|---|--- answer_2.md
-|---|--- ...
-|--- stack exchange site 2
-|---|--- answer_1.md
-|---|--- answer_2.md
-|---|--- ...
-
-To do this, this script proceeds as follows:
-1. Create a filter using the "/filters/create" method to get the network_user.account_id
-field from the network_users object returned by the "/users/{ids}/associated" method.
-2. Get all "network_user.account_id"'s for all stack exchange sites associated with
-the <user_id> using the "/users/{ids}/associated" method.
-3. For questions, create a filter using the "/filters/create" method to get the
-following fields from the "question" object type
-(https://api.stackexchange.com/docs/types/question):
-- answers
-- body_markdown
-- comments
-- creation_date
-- down_vote_count
-- up_vote_count
-- score
-4. For answers, create a filter using the "/filters/create" method to get the
-following fields from the "answer" object type
-(https://api.stackexchange.com/docs/types/answer):
-- question_id (go to the question and download it with the answers)
-TODO: remove these
-- accepted
-- body_markdown
-- comments
-- creation_date
-- is_accepted
-- down_vote_count
-- up_vote_count
-- score
-- question_id
-5. For each site extracted from step 2, do the following:
-    a. For each question extracted from this site, do the following:
-        i. Extract the fields mentioned in step 3 above using the created filter.
-        ii. Open a .md file and put the question, along with the answers, into the
-        file.
-    b. For each answer extracted from this site, do the following:
-        i. Extract the question_id field using the filter created in step 4.
-        ii. Open a .md file and put the question, along with the extracted answer, into
-        the file.
-
-NOTE: According to https://api.stackexchange.com/docs/paging, each response will
-have a maximum number of 100 items (the "pagesize" parameter) under the "items"
-field. Therefore, if there are more than 100 questions, we will need to process
-the first 100 questions, request the next 100 questions, process those, and so on,
-until the "has_more" property is set to "False". To request the next 100 questions,
-we will need to set the "page" property under the ".wrapper" category to "2", where
-this property was set to "1" for the first page. See
-https://api.stackexchange.com/docs/wrapper for details. Keep this in mind when
-making any request.
-
-
-NOTE: no need for "api_site_parameter" name. See https://api.stackexchange.com/docs
-> Each of these methods operates on a single site at a time, identified by the site
-> parameter. This parameter can be the full domain name (ie. "stackoverflow.com"), or a
-> short form identified by api_site_parameter on the site object. 
-
-NOTE: need the API key for this app to get a higher quota. See
-https://stackapps.com/apps/oauth/view/28114
-
-NOTE: authorization using an access_token is optional and only needed once. It is used
-to access specific methods that are restricted for authentication.
-Before doing all of this, you will need to authorize this stack app by going to the
-following URL ONLY ONCE:
-https://stackoverflow.com/oauth/dialog?client_id=28114&redirect_uri=https://stackoverflow.com/oauth/login_success
-
-You will then need to get the access token. See this answer for details:
-https://stackapps.com/a/6638/120681
-
-NOTE: the access token is valid for 1 day only and changes every time you authorize
-"""
-
 import requests
 import argparse
 import pathlib
@@ -107,14 +12,25 @@ parser.add_argument("--user_id",
                     type=str)
 args = parser.parse_args()
 
-# need this for a higher request quota per day. See
-# https://api.stackexchange.com/docs/authentication for details
+# need this Stack API key for a higher request quota per day. We created the "Backpack"
+# Stack app for this purpose, which can be found here: https://stackapps.com/apps/oauth/view/28114
+# See also https://api.stackexchange.com/docs/authentication for details
 api_key = "YLTVFmHkeJbm7ZIOoXstag(("
 
 # this must appear before every request
 base_url = "https://api.stackexchange.com/2.3/"
 
 #%% step 1
+"""
+Filters are useful for saving bandwidth and getting only the fields that you need in the
+response. See https://api.stackexchange.com/docs/filters for details.
+
+There is no need for the "api_site_parameter" name if you have the site URL. See
+https://api.stackexchange.com/docs, where it states:
+> Each of these methods operates on a single site at a time, identified by the site
+> parameter. This parameter can be the full domain name (ie. "stackoverflow.com"), or a
+> short form identified by api_site_parameter on the site object. 
+"""
 r = requests.get(base_url + f"filters/create",
                  params={"key":api_key,
                          "include":".items;"\
@@ -129,6 +45,17 @@ r = requests.get(base_url + f"filters/create",
                          "unsafe":"false"})
 network_users_filter = r.json()['items'][0]['filter']
 
+"""
+According to https://api.stackexchange.com/docs/paging, each response will
+have a maximum number of 100 items (the "pagesize" parameter) under the "items"
+field. Therefore, if there are more than 100 questions/answers/comment/etc., we will
+need to process the first 100 questions, request the next 100 questions, process those,
+and so on, until the "has_more" property is set to "False". To request the next 100
+questions, we will need to set the "page" property under the ".wrapper" category to "2",
+where this property was set to "1" for the first page. See
+https://api.stackexchange.com/docs/wrapper for details. Keep this in mind when
+making any request.
+"""
 has_more = True
 page_num = 0
 site_names = []
@@ -162,10 +89,22 @@ print(f"Found {len(site_names)} Stack Exchange sites associated with "\
       f"https://stackexchange.com/users/{args.user_id}")
 
 """
-NOTE: need the "shallow_user.display_name" field to return the owner associated with
+For questions, create a filter using the "/filters/create" method to get the
+following fields from the "question" object type
+(https://api.stackexchange.com/docs/types/question):
+- answers
+- body_markdown
+- comments
+- creation_date
+- down_vote_count
+- up_vote_count
+- score
+
+Need the "shallow_user.display_name" field to return the owner associated with
 a question or answer, since the return type is "shallow_user". If the owner is not
 returned, then this is a community wiki post.
-NOTE: for some reason, I can't request the "comment.body_markdown" field without also
+
+For some reason, I can't request the "comment.body_markdown" field without also
 requesting the "comment.body" field. If I try to do this, I won't get the
 "comment.body_markdown" field in the response.
 """
@@ -206,6 +145,12 @@ r = requests.get(base_url + f"filters/create",
                          "unsafe":"false"})
 questions_filter = r.json()['items'][0]['filter']
 
+"""
+For answers, create a filter using the "/filters/create" method to get the
+following fields from the "answer" object type
+(https://api.stackexchange.com/docs/types/answer):
+- question_id (to go to the question and download it along with its answers)
+"""
 r = requests.get(base_url + f"filters/create",
                  params={"key":api_key,
                          "include":".items;"\
@@ -231,7 +176,7 @@ def write_question(target_dir,question):
     # Also, we don't use the question title as the file name because the question
     # title can contain invalid characters (such as "$" for LaTeX). We use the
     # question ID instead.
-    # NOTE: we are assuming that question IDs for each site are unique, so there is no
+    # we are assuming that question IDs for each site are unique, so there is no
     # need to deliberately avoid overwriting
     fpath = (target_dir / str(question['question_id'])).with_suffix(".md")
     # if the file already exists, then skip it to save time
@@ -267,10 +212,8 @@ def write_question(target_dir,question):
     # See https://stackoverflow.com/q/2087370/13809128 for why "html.unescape" is
     # needed.
     f.write(html.unescape(f"{question['body_markdown']}\n"))
-    # TODO: remove this (only used for debugging)
-    # f.flush()
     # comments to the question
-    # NOTE: it is safer to use the ".get" method on the dict "question" because it may
+    # it is safer to use the ".get" method on the dict "question" because it may
     # be the case that the 'comments' field does not exist, such as when there are
     # no comments on the question
     for i,comment in enumerate(question.get('comments',[])):
@@ -345,26 +288,16 @@ def write_question(target_dir,question):
 for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
     print(f"Downloading and writing questions from site "\
           f"{i+1}/{len(site_names)} ({site_name})...",end="",flush=True)
-    #%% step 3a
+    #%% step 3(a)
     # create the "questions" directory for this site
     questions_dir = top_level_dir / site_name / "questions"
     questions_dir.mkdir(parents=True,exist_ok=True)
-    """
-    NOTE: According to https://api.stackexchange.com/docs/paging, each response will
-    have a maximum number of 100 items (the "pagesize" parameter) under the "items"
-    field. Therefore, if there are more than 100 questions, we will need to process
-    the first 100 questions, request the next 100 questions, process those, and so on,
-    until the "has_more" property is set to "False". To request the next 100 questions,
-    we will need to set the "page" property under the ".wrapper" category to "2", where
-    this property was set to "1" for the first page. See
-    https://api.stackexchange.com/docs/wrapper for details. 
-    """
     has_more = True
     page_num = 0
     while has_more:
         if has_more:
             page_num += 1
-        #%% step 3b
+        #%% step 3(b)
         r = requests.get(base_url + f"users/{user_id}/questions",
                         params={"key":api_key,
                                 "site":site_name,
@@ -374,24 +307,24 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
         data = r.json()
         has_more = data['has_more']
         questions = data['items']
-        #%% step 3c
-        # NOTE: if there are no questions associated with this site, then "questions"
+        #%% step 3(c)
+        # if there are no questions associated with this site, then "questions"
         # will be an empty list, such that the following for loop will be skipped.
         for question in questions:
             write_question(questions_dir,question)
     print(f"Done.")
     print(f"Downloading and writing answers from site "\
           f"{i+1}/{len(site_names)} ({site_name})...",end="",flush=True)
-    #%% step 3d
+    #%% step 3(d)
     # create the "answers" directory for this site
     answers_dir = top_level_dir / site_name / "answers"
     answers_dir.mkdir(parents=True,exist_ok=True)
-    # get all answers for this user for this site
     has_more = True
     page_num = 0
     while has_more:
         if has_more:
             page_num += 1
+        #%% step 3(e)
         r = requests.get(base_url + f"users/{user_id}/answers",
                         params={"key":api_key,
                                 "site":site_name,
@@ -401,7 +334,7 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
         data = r.json()
         has_more = data['has_more']
         answers = data['items']
-        # extract the question IDs and put them into a query string
+        #%% step 3(f)
         question_ids = ""
         for i,answer in enumerate(answers):
             question_ids += f"{answer['question_id']}"
@@ -409,6 +342,7 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
             # an error
             if i < len(answers) - 1:
                 question_ids += ";"
+        #%% step 3(g)
         # in case there are no answers associated with this site, skip it
         if len(answers) > 0:
             # get all the questions associated with these answers. Since there will always

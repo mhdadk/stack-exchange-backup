@@ -167,9 +167,15 @@ user ID and the corresponding site ID associated with each site.
 
     (d) Create the `answers` directory for this SE site.
 
-    (e)
+    (e) Get all answers associated with this user on this SE site.
 
+    (f) For each answer associated with this user on this SE site, get the ID of the
+    question associated with the answer.
 
+    (g) For each question ID obtained in step 3(f), get the corresponding question, and
+    then write the contents of the question, its comments, the answers, including yours,
+    and their comments into a Markdown file using the format mentioned in the
+    "Format" section above.
 
 # Alternatives
 
