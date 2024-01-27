@@ -7,7 +7,7 @@ Download all of your questions and answers from all Stack Exchange (SE) sites us
 To get started, make sure that Python version 3.11.7 or newer is installed. Then, run the
 following commands (note that these commands were tested in Powershell, and should be
 translated for use in bash, zsh, etc.):
-```powershell
+```bash
 git clone https://github.com/mhdadk/stack-exchange-backup.git
 cd stack-exchange-backup
 # create a virtual environment
