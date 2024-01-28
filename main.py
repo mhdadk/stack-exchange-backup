@@ -12,8 +12,7 @@ parser.add_argument("--user_id",
                     type=str)
 args = parser.parse_args()
 
-# need this Stack API key for a higher request quota per day. We created the "Backpack"
-# Stack app for this purpose, which can be found here: https://stackapps.com/apps/oauth/view/28114
+# need this Stack API key for a higher request quota per day.
 # See also https://api.stackexchange.com/docs/authentication for details
 api_key = "YLTVFmHkeJbm7ZIOoXstag(("
 
