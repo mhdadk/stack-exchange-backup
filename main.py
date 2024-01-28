@@ -334,9 +334,9 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
         """
         if "backoff" in data:
             print("We've made too many requests to the Stack Exchange API, so we will "\
-                  f"need to wait for {data['backoff']} seconds. Please be patient...")
+                  f"need to wait for {data['backoff']} seconds. Please be patient...",flush=True)
             time.sleep(data['backoff'] + 1) # add a second just in case
-            print("We are back in business.")
+            print("We are back in business.",flush=True)
             print(f"Downloading and writing the remaining questions from {site_name}...",
                   end="",flush=True)
     print(f"Done.")
@@ -397,9 +397,9 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
             write_question(answers_dir,question)
         if backoff:
             print("We've made too many requests to the Stack Exchange API, so we will "\
-                f"need to wait for {backoff_time} seconds. Please be patient...")
+                f"need to wait for {backoff_time} seconds. Please be patient...",flush=True)
             time.sleep(backoff_time + 1) # add a second just in case
-            print("We are back in business.")
+            print("We are back in business.",flush=True)
             print(f"Downloading and writing the remaining answers from {site_name}..."
                   ,end="",flush=True)
     print(f"Done.")
