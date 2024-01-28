@@ -1,6 +1,6 @@
 # Stack Exchange Backup
 
-| ![](assets/se_backup.gif) | <img src="assets/example1.png" width="350" /> |
+| <img src="assets/se_backup.gif" width="350" /> | <img src="assets/example1.png" width="350" /> |
 | --- | --- |
 | <img src="assets/example2.png" width="350" /> | <img src="assets/example3.png" width="350" /> |
 
