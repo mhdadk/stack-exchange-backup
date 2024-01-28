@@ -1,6 +1,8 @@
 # Stack Exchange Backup
 
-![](assets/se_backup.gif)
+| ![](assets/se_backup.gif) | <img src="assets/example1.png" width="350" /> |
+| --- | --- |
+| <img src="assets/example2.png" width="350" /> | <img src="assets/example3.png" width="350" /> |
 
 Download all of your questions and answers as Markdown files from all Stack Exchange (SE) sites using a Python script and the [SE API](https://api.stackexchange.com/).
 
