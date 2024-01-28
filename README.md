@@ -34,10 +34,11 @@ python main.py --user_id <user id>
 ```
 where `<user id>` should be replaced with your own `user id` that you obtained by following the instructions under the "Getting started" section above. See the "Format" section below for details on the format of the files that are downloaded.
 
-NOTE: you may notice that there are fewer answers downloaded under the `answers` directory
-for a specific SE site than the number of answers shown on the SE site itself online. The
-reason for this is that more than one of your answers may be associated with the same question. In this
-case, the question and your multiple answers for it are downloaded once only.
+**NOTE**: you may notice that, for some SE sites, there are fewer answers downloaded
+under the `answers` directory than the number of answers shown on the SE site itself
+online. The reason for this is that more than one of your answers may be associated with
+the same question. In this case, the question and your multiple answers for it are
+downloaded once only.
 
 # Format
 
