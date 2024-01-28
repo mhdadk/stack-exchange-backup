@@ -1,5 +1,7 @@
 # Stack Exchange Backup
 
+![](assets/se_backup.gif)
+
 Download all of your questions and answers as Markdown files from all Stack Exchange (SE) sites using a Python script and the [SE API](https://api.stackexchange.com/).
 
 # Getting started
