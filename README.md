@@ -1,6 +1,6 @@
 # Stack Exchange Backup
 
-Download all of your questions and answers from all Stack Exchange (SE) sites using a Python script and the [SE API](https://api.stackexchange.com/). This also makes use of the [Backpack](https://stackapps.com/apps/oauth/view/28114) Stack app.
+Download all of your questions and answers as Markdown files from all Stack Exchange (SE) sites using a Python script and the [SE API](https://api.stackexchange.com/). This also makes use of the [Backpack](https://stackapps.com/apps/oauth/view/28114) Stack app.
 
 # Getting started
 
