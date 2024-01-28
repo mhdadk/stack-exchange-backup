@@ -3,6 +3,7 @@ import argparse
 import pathlib
 import datetime
 import html
+import time
 
 # parse command-line arguments
 parser = argparse.ArgumentParser()
@@ -28,7 +29,10 @@ There is no need for the "api_site_parameter" name if you have the site URL. See
 https://api.stackexchange.com/docs, where it states:
 > Each of these methods operates on a single site at a time, identified by the site
 > parameter. This parameter can be the full domain name (ie. "stackoverflow.com"), or a
-> short form identified by api_site_parameter on the site object. 
+> short form identified by api_site_parameter on the site object.
+
+Need the ".backoff" parameter to detect throttling. See https://api.stackexchange.com/docs/throttle
+for details.
 """
 r = requests.get(base_url + f"filters/create",
                  params={"key":api_key,
@@ -38,6 +42,7 @@ r = requests.get(base_url + f"filters/create",
                                    ".page_size;"\
                                    ".quota_max;"\
                                    ".quota_remaining;"\
+                                   ".backoff;"\
                                    "network_user.site_url;"\
                                    "network_user.user_id",
                          "base":"none",
@@ -115,6 +120,7 @@ r = requests.get(base_url + f"filters/create",
                                     ".page_size;"\
                                     ".quota_max;"\
                                     ".quota_remaining;"\
+                                    ".backoff;"\
                                     "shallow_user.display_name;"\
                                     "question.answers;"\
                                     "question.title;"\
@@ -158,6 +164,7 @@ r = requests.get(base_url + f"filters/create",
                                    ".page_size;"\
                                    ".quota_max;"\
                                    ".quota_remaining;"\
+                                   ".backoff;"\
                                    "answer.question_id",
                          "base":"none",
                          "unsafe":"false"})
@@ -311,6 +318,27 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
         # will be an empty list, such that the following for loop will be skipped.
         for question in questions:
             write_question(questions_dir,question)
+        """
+        According to https://api.stackexchange.com/docs/throttle:
+
+        > A dynamic throttle is also in place on a per-method level. If an application
+        > receives a response with the backoff field set, it must wait that many seconds
+        > before hitting the same method again. For the purposes of throttling, all /me
+        > routes are considered to be identical to their /users/{ids} equivalent. Note
+        > that backoff is set based on a combination of factors, and may not be
+        > consistently returned for the same arguments to the same method. Additionally,
+        > all methods (even seemingly trivial ones) may return backoff.
+
+        So, we will need to wait a certain amount of time if the "backoff" parameter is
+        returned in the response before making another request.
+        """
+        if "backoff" in data:
+            print("We've made too many requests to the Stack Exchange API, so we will "\
+                  f"need to wait for {data['backoff']} seconds. Please be patient...")
+            time.sleep(data['backoff'] + 1) # add a second just in case
+            print("We are back in business.")
+            print(f"Downloading and writing the remaining questions from {site_name}...",
+                  end="",flush=True)
     print(f"Done.")
     print(f"Downloading and writing answers from site "\
           f"{i+1}/{len(site_names)} ({site_name})...",end="",flush=True)
@@ -321,6 +349,7 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
     has_more = True
     page_num = 0
     while has_more:
+        backoff = False
         if has_more:
             page_num += 1
         #%% step 3(e)
@@ -333,6 +362,12 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
         data = r.json()
         has_more = data['has_more']
         answers = data['items']
+        # in case there are no answers associated with this site, skip it
+        if len(answers) == 0:
+            continue
+        if "backoff" in data:
+            backoff = True
+            backoff_time = data["backoff"]
         #%% step 3(f)
         question_ids = ""
         for i,answer in enumerate(answers):
@@ -342,17 +377,29 @@ for i,(site_name,user_id) in enumerate(zip(site_names,user_ids)):
             if i < len(answers) - 1:
                 question_ids += ";"
         #%% step 3(g)
-        # in case there are no answers associated with this site, skip it
-        if len(answers) > 0:
-            # get all the questions associated with these answers. Since there will always
-            # be a maximum of 100 answers, then there will always be 100 questions, and
-            # so we don't need to iterate through pages here
-            r = requests.get(base_url + f"questions/{question_ids}",
-                            params={"key":api_key,
-                                    "site":site_name,
-                                    "filter":questions_filter,
-                                    "pagesize":"100"})
-            questions = r.json()['items']
-            for question in questions:
-                write_question(answers_dir,question)
+        # get all the questions associated with these answers. Since there will always
+        # be a maximum of 100 answers, then there will always be 100 questions, and
+        # so we don't need to iterate through pages here
+        r = requests.get(base_url + f"questions/{question_ids}",
+                        params={"key":api_key,
+                                "site":site_name,
+                                "filter":questions_filter,
+                                "pagesize":"100"})
+        data = r.json()
+        questions = data['items']
+        if "backoff" in data:
+            if backoff: # if "backoff" is already needed from the previous method
+                backoff_time = max(data["backoff"],backoff_time)
+            else:
+                backoff = True
+                backoff_time = data["backoff"]
+        for question in questions:
+            write_question(answers_dir,question)
+        if backoff:
+            print("We've made too many requests to the Stack Exchange API, so we will "\
+                f"need to wait for {backoff_time} seconds. Please be patient...")
+            time.sleep(backoff_time + 1) # add a second just in case
+            print("We are back in business.")
+            print(f"Downloading and writing the remaining answers from {site_name}..."
+                  ,end="",flush=True)
     print(f"Done.")
