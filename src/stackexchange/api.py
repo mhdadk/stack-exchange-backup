@@ -213,6 +213,8 @@ class StackExchangeApi(metaclass=SingletonMeta):
             kwargs["auth"] = BearerAuth(self.api_key)
         if "timeout" not in kwargs:
             kwargs["timeout"] = (5, 30)
+        if "allow_redirects" not in kwargs:
+            kwargs["allow_redirects"] = False
         match method:
             case HTTPMethod.GET:
                 kwargs["params"] = query_converter.unstructure(params)

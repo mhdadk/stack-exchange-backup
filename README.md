@@ -21,25 +21,12 @@
 
 ## Installation
 
-1. Either download the repository as a ZIP file and extract it,
-   or [install Git](https://git-scm.com/downloads) (recommended) and do a `git clone` of the project.
-
-   ```shell
-   git clone https://github.com/9ao9ai9ar/stack-exchange-backup.git
-   ```
-
-2. [Install Python 3.12 or newer](https://www.python.org/downloads/).
+1. [Install Python 3.12 or newer](https://www.python.org/downloads/).
    See the [support section](#support) for additional information.
 
-3. Enter the directory you just extracted/cloned.
+2. [Install Git](https://git-scm.com/downloads).
 
-   ```shell
-   cd stack-exchange-backup
-   ```
-
-   All steps hereafter assume operations under said directory.
-
-4. Create and activate a virtual environment (strongly recommended).
+3. Create and activate a virtual environment.
 
     * Windows:
 
@@ -55,16 +42,10 @@
        . .venv/bin/activate
        ```
 
-5. Install `stack-exchange-backup` as a local Python package.
+4. Install (or update) `stack-exchange-backup`.
 
    ```shell
-   python -m pip install .
-   ```
-
-   If the script fails to run due to changing dependencies, you may install the last known working versions.
-
-   ```shell
-   python -m pip install -r ./requirements.txt
+   python -m pip install --require-virtualenv -U "git+https://github.com/9ao9ai9ar/stack-exchange-backup@main"
    ```
 
 ## Usage
@@ -216,6 +197,11 @@ some insufficiently explained, and the numerous bugs scattered all over the plac
 
 StackExchangeBackupLaravel allows exporting a somewhat complete data footprint of a user on the Stack Exchange network.
 The user contents are saved in JSON and uploaded to Amazon S3 by default.
+
+#### [stexport](https://github.com/karlicoss/stexport)
+
+A module within the Human Programming Interface that uses [StackAPI](https://github.com/AWegnerGitHub/stackapi)
+to liberate data from the Stack Exchange network of silos.
 
 ### [Stack Exchange Data Explorer](https://data.stackexchange.com/)
 
