@@ -1,0 +1,22 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/closed-details'
+description: |+
+  This type represents details about a question closure.
+type: object
+properties:
+  by_users:
+    type: array
+    items:
+      $ref: './shallow_user.yaml'
+  description:
+    type: string
+    description: unchanged in unsafe filters
+  on_hold:
+    type: boolean
+  original_questions:
+    type: array
+    items:
+      $ref: './original_question.yaml'
+  reason:
+    type: string
+    description: unchanged in unsafe filters

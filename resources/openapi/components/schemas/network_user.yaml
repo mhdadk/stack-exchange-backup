@@ -1,0 +1,46 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/network-user'
+description: |+
+  This type represents a user, however it is greatly reduced when compared to the full User type to reduce the amount of work that needs to be done to fetch it from multiple sites in the network.
+type: object
+properties:
+  account_id:
+    type: integer
+  answer_count:
+    type: integer
+  badge_counts:
+    $ref: './badge_count.yaml'
+  creation_date:
+    type: integer
+    format: int64
+  last_access_date:
+    type: integer
+    format: int64
+  question_count:
+    type: integer
+  reputation:
+    type: integer
+  site_name:
+    type: string
+  site_url:
+    type: string
+    format: uri
+  top_answers:
+    type: array
+    items:
+      $ref: './network_post.yaml'
+  top_questions:
+    type: array
+    items:
+      $ref: './network_post.yaml'
+  user_id:
+    type: integer
+    description: refers to a User
+  user_type:
+    type: string
+    enum:
+      - unregistered
+      - registered
+      - moderator
+      - team_admin
+      - does_not_exist

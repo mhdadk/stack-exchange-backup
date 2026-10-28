@@ -1,0 +1,17 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/original-question'
+description: |+
+  This type represents an "original" question that another was closed as a duplicate of.
+
+  This type is mostly analogous to a row in the "gray box" that appears in questions closed a dupes which lists original questions.
+type: object
+properties:
+  accepted_answer_id:
+    type: integer
+  answer_count:
+    type: integer
+  question_id:
+    type: integer
+    description: refers to a Question
+  title:
+    type: string

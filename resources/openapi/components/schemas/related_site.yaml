@@ -1,0 +1,21 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/related-site'
+description: |+
+  This type represents a site that is related in some way to another site.
+
+  Examples include chat and meta, and parent sites.
+
+  Applications should be able to gracefully handle the additon of new related site types.
+type: object
+properties:
+  api_site_parameter:
+    type: string
+  name:
+    type: string
+  relation:
+    type: string
+    description: one of parent, meta, or chat, but new options may be added.
+  site_url:
+    type: string
+    format: uri
+    description: unchanged in unsafe filters

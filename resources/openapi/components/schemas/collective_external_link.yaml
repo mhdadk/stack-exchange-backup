@@ -1,0 +1,18 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/collective-external-link'
+description: |+
+  Represents a collective's external link.
+type: object
+properties:
+  link:
+    type: string
+  type:
+    type: string
+    enum:
+      - website
+      - twitter
+      - github
+      - facebook
+      - instagram
+      - support
+      - linkedin

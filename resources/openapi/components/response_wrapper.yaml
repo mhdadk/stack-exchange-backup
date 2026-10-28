@@ -1,0 +1,32 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/wrapper'
+type: object
+properties:
+  backoff:
+    type: integer
+  error_id:
+    type: integer
+    description: refers to an Error
+  error_message:
+    type: string
+  error_name:
+    type: string
+  has_more:
+    type: boolean
+  items:
+    type: array
+    description: an array of the type found in type
+    items:
+      type: object
+  page:
+    type: integer
+  page_size:
+    type: integer
+  quota_max:
+    type: integer
+  quota_remaining:
+    type: integer
+  total:
+    type: integer
+  type: # discriminator
+    type: string

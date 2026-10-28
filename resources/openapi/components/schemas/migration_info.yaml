@@ -1,0 +1,14 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/migration-info'
+description: |+
+  This type represents a question's migration to or from a different site in the Stack Exchange network.
+type: object
+properties:
+  on_date:
+    type: integer
+    format: int64
+  other_site:
+    $ref: './site.yaml'
+  question_id:
+    type: integer
+    description: refers to a Question

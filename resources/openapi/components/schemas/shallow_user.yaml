@@ -1,0 +1,35 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/shallow-user'
+description: |+
+  This type represents a user, but omits many of the fields found on the full User type.
+
+  This type is mostly analogous to the "user card" found on many pages (like the question page) on a Stack Exchange site.
+type: object
+properties:
+  accept_rate:
+    type: integer
+  account_id:
+    type: integer
+  badge_counts:
+    $ref: './badge_count.yaml'
+  display_name:
+    type: string
+  link:
+    type: string
+    description: unchanged in unsafe filters
+  profile_image:
+    type: string
+    description: unchanged in unsafe filters
+  reputation:
+    type: integer
+  user_id:
+    type: integer
+    description: refers to a User
+  user_type:
+    type: string
+    enum:
+      - unregistered
+      - registered
+      - moderator
+      - team_admin
+      - does_not_exist

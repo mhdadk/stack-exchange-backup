@@ -1,0 +1,358 @@
+openapi: 3.1.0
+
+info:
+  title: Stack Exchange API
+  termsOfService: 'https://stackoverflow.com/legal/api-terms-of-use'
+  version: '2.3'
+
+servers:
+  - url: 'https://api.stackexchange.com/2.3'
+
+components:
+  schemas:
+    # Top Level Types
+    Answer:
+      $ref: './components/schemas/answer.yaml'
+    Collective:
+      $ref: './components/schemas/collective.yaml'
+    Comment:
+      $ref: './components/schemas/comment.yaml'
+    Error:
+      $ref: './components/schemas/error.yaml'
+    Filter:
+      $ref: './components/schemas/filter.yaml'
+    NetworkUser:
+      $ref: './components/schemas/network_user.yaml'
+    Question:
+      $ref: './components/schemas/question.yaml'
+    Site:
+      $ref: './components/schemas/site.yaml'
+    # Member Types
+    BadgeCount:
+      $ref: './components/schemas/badge_count.yaml'
+    ClosedDetails:
+      $ref: './components/schemas/closed_details.yaml'
+    CollectiveExternalLink:
+      $ref: './components/schemas/collective_external_link.yaml'
+    CollectiveRecommendation:
+      $ref: './components/schemas/collective_recommendation.yaml'
+    MigrationInfo:
+      $ref: './components/schemas/migration_info.yaml'
+    NetworkPost:
+      $ref: './components/schemas/network_post.yaml'
+    Notice:
+      $ref: './components/schemas/notice.yaml'
+    OriginalQuestion:
+      $ref: './components/schemas/original_question.yaml'
+    RelatedSite:
+      $ref: './components/schemas/related_site.yaml'
+    ShallowUser:
+      $ref: './components/schemas/shallow_user.yaml'
+    Styling:
+      $ref: './components/schemas/styling.yaml'
+    # Response Type Template
+    ResponseWrapper:
+      $ref: './components/response_wrapper.yaml'
+  parameters:
+    Filter:
+      name: filter
+      in: query
+      schema:
+        externalDocs:
+          url: 'https://api.stackexchange.com/docs/filters'
+        type: string
+        description: |+
+          Filters allow applications to reduce API responses to just the fields they are concerned with, 
+          saving bandwidth.
+    Paging:
+      name: paging
+      in: query
+      schema:
+        externalDocs:
+          url: 'https://api.stackexchange.com/docs/paging'
+        type: object
+        properties:
+          page:
+            type: integer
+            format: int32
+            description: Minimum and maximum values determined from testing.
+            minimum: 1
+            maximum: 2147483647
+            default: 1
+          pagesize:
+            type: integer
+            format: int32
+            description: |+
+              The effective minimum and maximum are, respectively, -2^31 and 100, 
+              with the sole exception of the /sites route for which the effective maximum is 2^31 - 2, 
+              beyond which a bad_parameter error is returned.
+              Negative integers are treated as 0.
+            minimum: 0
+            maximum: 100
+            default: 30
+    Complex:
+      name: complex
+      in: query
+      schema:
+        externalDocs:
+          url: 'https://api.stackexchange.com/docs/min-max'
+        type: object
+        properties:
+          sort:
+            oneOf:
+              - type: string
+              - type: string
+                description: |+
+                  activity - last_activity_date
+                  creation - creation_date
+                  votes - score
+                enum:
+                  - activity
+                  - creation
+                  - votes
+                default: activity
+          min:
+            type:
+              - integer
+          max:
+            type:
+              - integer
+          fromdate:
+            type: integer
+            format: int64
+            description: Defines the lower bound of creation_date.
+          todate:
+            type: integer
+            format: int64
+            description: Defines the upper bound of creation_date.
+          order:
+            type: string
+            description: Omitted in the documentation, but is always found to accompany other properties in the group.
+            enum:
+              - asc
+              - desc
+    Ids:
+      name: ids
+      in: path
+      required: true
+      schema:
+        externalDocs:
+          url: 'https://api.stackexchange.com/docs/vectors'
+        type: array
+        description: |+
+          Most methods that take ids in the API will take up to 100 of them in a single go.
+          When passing a vector, separate each id with a semicolon.
+          Vectors are not restricted to integer values, some are lists of strings ({tags}) or guids ({ids}).
+        maxItems: 100
+        items:
+          type:
+            - integer
+      example: 1;2;3
+    Site:
+      name: site
+      in: query
+      schema:
+        externalDocs:
+          url: 'https://api.stackexchange.com/docs?tab=category#docs'
+        type: string
+        description: |+
+          Per-site methods operates on a single site at a time, identified by the site parameter. 
+          This parameter can be the full domain name (ie. "stackoverflow.com"), 
+          or a short form identified by api_site_parameter on the Site object.
+  responses:
+    default:
+      description: Default
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ResponseWrapper'
+  securitySchemes:
+    ApiKeyAuth:
+      type: http
+      description: >
+        More information can be found at https://api.stackexchange.com/docs/authentication.
+      scheme: bearer
+
+paths:
+  /questions/{ids}:
+    get:
+      tags:
+        - Per-Site Methods
+        - Questions
+      description: Returns the questions identified in {ids}.
+      externalDocs:
+        url: 'https://api.stackexchange.com/docs/questions-by-ids'
+      operationId: questions-by-ids
+      parameters:
+        - $ref: '#/components/parameters/Ids'
+        - $ref: '#/components/parameters/Site'
+        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/Paging'
+        - $ref: '#/components/parameters/Complex'
+  /users/{ids}/answers:
+    get:
+      tags:
+        - Per-Site Methods
+        - Users
+      description: Returns the answers the users in {ids} have posted.
+      externalDocs:
+        url: 'https://api.stackexchange.com/docs/answers-on-users'
+      operationId: answers-on-users
+      parameters:
+        - $ref: '#/components/parameters/Ids'
+        - $ref: '#/components/parameters/Site'
+        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/Paging'
+        - $ref: '#/components/parameters/Complex'
+  /users/{ids}/questions:
+    get:
+      tags:
+        - Per-Site Methods
+        - Users
+      description: Gets the questions asked by the users in {ids}.
+      externalDocs:
+        url: 'https://api.stackexchange.com/docs/questions-on-users'
+      operationId: questions-on-users
+      parameters:
+        - $ref: '#/components/parameters/Ids'
+        - $ref: '#/components/parameters/Site'
+        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/Paging'
+        - $ref: '#/components/parameters/Complex'
+  /errors/{id}:
+    get:
+      tags:
+        - Network Methods
+        - Errors
+      description: This method allows you to generate an error.
+      externalDocs:
+        url: 'https://api.stackexchange.com/docs/simulate-error'
+      operationId: simulate-error
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - $ref: '#/components/parameters/Filter'
+  /filters/create:
+    get:
+      tags:
+        - Network Methods
+        - Filters
+      description: Creates a new filter given a list of includes, excludes, a base filter, and whether or not this filter should be "unsafe".
+      externalDocs:
+        url: 'https://api.stackexchange.com/docs/create-filter'
+      operationId: create-filter
+      parameters:
+        - $ref: '#/components/parameters/Filter'
+        - name: include
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          example: .page;.pagesize
+        - name: exclude
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+          example: .quota_max;.quota_remaining
+        - name: base
+          in: query
+          schema:
+            type: string
+        - name: unsafe
+          in: query
+          schema:
+            type: boolean
+            default: false
+  /filters/{filters}:
+    get:
+      tags:
+        - Network Methods
+        - Filters
+      description: Returns the fields included by the given filters, and the "safeness" of those filters.
+      externalDocs:
+        url: 'https://api.stackexchange.com/docs/read-filter'
+      operationId: read-filter
+      parameters:
+        - name: filters
+          in: path
+          required: true
+          schema:
+            type: array
+            maxItems: 20
+            items:
+              type: string
+          example: default;withbody
+        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/Paging'
+  /sites:
+    get:
+      tags:
+        - Network Methods
+        - Sites
+      description: Returns all sites in the network.
+      externalDocs:
+        url: 'https://api.stackexchange.com/docs/sites'
+      operationId: sites
+      parameters:
+        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/Paging'
+  /users/{ids}/associated:
+    get:
+      tags:
+        - Network Methods
+        - Users
+      description: Returns all of a user's associated accounts, given their account_ids in {ids}.
+      externalDocs:
+        url: 'https://api.stackexchange.com/docs/associated-users'
+      operationId: associated-users
+      parameters:
+        - $ref: '#/components/parameters/Ids'
+        - $ref: '#/components/parameters/Filter'
+        - $ref: '#/components/parameters/Paging'
+        - name: types
+          in: query
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - main_site
+                - meta_site
+            description: Specify, semicolon delimited, main_site or meta_site to filter by site.
+
+security:
+    - ApiKeyAuth: []
+
+tags:
+  - name: Per-Site Methods
+  - name: Answers
+  - name: Badges
+  - name: Collectives
+  - name: Comments
+  - name: Events
+  - name: Info
+  - name: Posts
+  - name: Privileges
+  - name: Questions
+  - name: Revisions
+  - name: Search
+  - name: Suggested Edits
+  - name: Tags
+  - name: Users
+  - name: Network Methods
+  - name: Access Tokens
+  - name: Achievements
+  - name: Applications
+  - name: Errors
+  - name: Filters
+  - name: Inbox
+  - name: Notifications
+  - name: Sites
+  - name: Top Level Types
+  - name: Member Types

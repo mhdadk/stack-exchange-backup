@@ -1,0 +1,20 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/filter'
+description: |+
+  This type describes a filter on the API.
+
+  When passing a filter to methods in the API, it should be referred to by name alone.
+type: object
+properties:
+  filter:
+    type: string
+  filter_type:
+    type: string
+    enum:
+      - safe
+      - unsafe
+      - invalid
+  included_fields:
+    type: array
+    items:
+      type: string

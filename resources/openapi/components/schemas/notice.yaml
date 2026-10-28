@@ -1,0 +1,14 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/notice'
+description: |+
+  Represents a notice on a post.
+type: object
+properties:
+  body:
+    type: string
+    description: unchanged in unsafe filters
+  creation_date:
+    type: integer
+    format: int64
+  owner_user_id:
+    type: integer

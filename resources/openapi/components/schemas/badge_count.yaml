@@ -1,0 +1,12 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/badge-count'
+description: |+
+  This type represents the total Badges, segregated by rank, a user has earned.
+type: object
+properties:
+  bronze:
+    type: integer
+  gold:
+    type: integer
+  silver:
+    type: integer

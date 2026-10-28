@@ -1,0 +1,63 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/site'
+description: |+
+  This type represents a site in the Stack Exchange network.
+type: object
+properties:
+  aliases:
+    type: array
+    items:
+      type: string
+  api_site_parameter:
+    type: string
+  audience:
+    type: string
+  closed_beta_date:
+    type: integer
+    format: int64
+  favicon_url:
+    type: string
+    format: uri
+  high_resolution_icon_url:
+    type: string
+    format: uri
+  icon_url:
+    type: string
+    format: uri
+  launch_date:
+    type: integer
+    format: int64
+  logo_url:
+    type: string
+    format: uri
+  markdown_extensions:
+    type: array
+    description: an array of 'MathJax', 'Prettify', 'Balsamiq' or 'jTab' strings, but new options may be added.
+    items:
+      type: string
+  name:
+    type: string
+  open_beta_date:
+    type: integer
+    format: int64
+  related_sites:
+    type: array
+    items:
+      $ref: './related_site.yaml'
+  site_state:
+    type: string
+    enum:
+      - normal
+      - closed_beta
+      - open_beta
+      - linked_meta
+  site_type:
+    type: string
+    description: one of main_site or meta_site, but new options may be added.
+  site_url:
+    type: string
+    format: uri
+  styling:
+    $ref: './styling.yaml'
+  twitter_account:
+    type: string

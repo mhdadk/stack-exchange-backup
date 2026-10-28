@@ -1,0 +1,17 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/error'
+description: |+
+  This type is used to describe the errors that can be returned by the API.
+
+  It is not expected that many applications will concern themselves with this type. It is made available for development and testing purposes.
+
+  Note that the field-name description for each record returned differs from the field-name error_message that is part of the common response wrapper on individual API requests.
+type: object
+properties:
+  description:
+    type: string
+  error_id:
+    type: integer
+    description: refers to an Error
+  error_name:
+    type: string

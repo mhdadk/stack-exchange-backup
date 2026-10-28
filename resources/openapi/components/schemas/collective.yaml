@@ -1,0 +1,22 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/collective'
+description: |+
+  This type represents a collective on a Stack Exchange site.
+type: object
+properties:
+  description:
+    type: string
+  external_links:
+    type: array
+    items:
+      $ref: './collective_external_link.yaml'
+  link:
+    type: string
+  name:
+    type: string
+  slug:
+    type: string
+  tags:
+    type: array
+    items:
+      type: string

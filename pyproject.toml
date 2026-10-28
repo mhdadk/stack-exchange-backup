@@ -1,0 +1,213 @@
+[build-system]
+requires = ["setuptools >= 83.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "stack-exchange-backup"
+version = "2026.10.24"
+description = "Download all your posts on the Stack Exchange network as Markdown files."
+readme = "./README.md"
+requires-python = ">= 3.12"
+license = "MIT"
+license-files = ["./LICENSE"]
+authors = [{ name = "Wei Cheng", email = "weicheng018@gmail.com" }]
+keywords = [
+    "Stack Exchange",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    #    "Development Status :: 4 - Beta",
+    #    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "Operating System :: OS Independent",
+    "Operating System :: Microsoft :: Windows",
+    #    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: POSIX :: Linux",
+    #    "Operating System :: POSIX :: BSD",
+    #    "Operating System :: POSIX :: SunOS/Solaris",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Python :: Implementation :: GraalPy",
+    "Topic :: System :: Archiving :: Backup",
+]
+urls.source = "https://github.com/9ao9ai9ar/stack-exchange-backup"
+dependencies = [
+    "attrs >= 26.1.0", # https://www.attrs.org/en/stable/changelog.html
+    "cattrs[pyyaml] >= 25.3.0", # https://catt.rs/en/stable/history.html
+    "requests >= 2.33.0", # https://requests.readthedocs.io/en/latest/community/updates/#release-history
+    "ruamel.yaml >= 0.18.16", # https://sourceforge.net/p/ruamel-yaml/code/ci/default/tree/CHANGES
+]
+
+[dependency-groups]
+dev = [
+    "datamodel-code-generator[isort,ruff] >= 0.86.0", # https://github.com/koxudaxi/datamodel-code-generator/releases
+    "openapi-spec-validator >= 0.9.0", # https://github.com/python-openapi/openapi-spec-validator/releases
+    "pylint >= 4.1.3, < 5", # https://pylint.readthedocs.io/en/latest/whatsnew/4/index.html
+    "ruff >= 0.17.2", # https://github.com/astral-sh/ruff/releases
+]
+sit = [
+    "pytest >= 9.1.0, < 10", # https://docs.pytest.org/en/stable/changelog.html
+]
+uat = [
+    "memory-profiler >= 0.61.0",
+    "memray >= 1.20.0 ; sys_platform == 'linux' or sys_platform == 'darwin'", # https://bloomberg.github.io/memray/changelog.html
+]
+prod = [
+    "bumpver >= 2026.1132", # https://github.com/mbarkhau/bumpver/blob/master/CHANGELOG.md
+    "validate-pyproject[all] >= 0.27", # https://validate-pyproject.readthedocs.io/en/latest/changelog.html
+]
+all = [
+    { include-group = "dev" },
+    { include-group = "sit" },
+    { include-group = "uat" },
+    { include-group = "prod" },
+]
+
+# https://github.com/mbarkhau/bumpver?tab=readme-ov-file#configuration
+[tool.bumpver]
+current_version = "2026.10.24"
+version_pattern = "YYYY.0M.0D[-PATCH]"
+commit = false
+
+[tool.bumpver.file_patterns]
+"pyproject.toml" = [
+    '^current_version = "{version}"',
+    '^version = "{version}"',
+]
+
+# https://koxudaxi.github.io/datamodel-code-generator/cli-reference/quick-reference/
+[tool.datamodel-codegen]
+additional-imports = "attr.dataclass"
+formatters = [
+    "isort",
+    "ruff-check",
+    "ruff-format",
+]
+input = "./resources/openapi/openapi.yaml"
+input-file-type = "openapi"
+output = "./src/stackexchange/generated/_model_openapi.py"
+output-model-type = "dataclasses.dataclass"
+## Typing customization:
+enum-field-as-literal = "all"
+## Field customization:
+use-field-description = true
+## Model customization:
+collapse-root-models = true
+disable-timestamp = true
+keep-model-order = true
+keyword-only = true
+use-exact-imports = true
+use-schema-description = true
+## Template customization:
+encoding = "utf-8"
+use-double-quotes = true
+## OpenAPI-only options:
+openapi-scopes = [
+    "schemas",
+    "parameters",
+    "paths",
+]
+use-operation-id-as-name = true
+
+# https://pylint.readthedocs.io/en/latest/user_guide/messages/messages_overview.html
+[tool.pylint.main]
+disable = [
+    "missing-class-docstring",
+    "missing-function-docstring",
+    "missing-module-docstring",
+    "no-else-return",
+    "unused-argument",
+    "unused-wildcard-import",
+    "wildcard-import",
+]
+enable = [
+    "useless-suppression",
+]
+fail-under = 9
+ignore-paths = [
+    ".*/generated",
+]
+jobs = 0
+load-plugins = [
+    "pylint.extensions.code_style",
+]
+output-format = "colorized"
+
+[tool.pylint.design]
+max-args = 5 # Default
+max-attributes = 7 # Default
+max-locals = 15 # Default
+min-public-methods = 2 # Default
+
+[tool.pylint.format]
+max-line-length = 99
+
+# https://microsoft.github.io/pyright/#/configuration?id=type-check-diagnostics-settings
+[tool.pyright]
+include = [
+    "./src",
+    "./tests",
+]
+exclude = [
+    "**/__pycache__",
+]
+typeCheckingMode = "strict"
+deprecateTypingAliases = true
+reportUnnecessaryTypeIgnoreComment = true
+# "error" in "strict" mode
+reportUnknownParameterType = false
+reportUnknownArgumentType = false
+reportUnknownLambdaType = false
+reportUnknownVariableType = false
+reportUnknownMemberType = false
+reportMissingParameterType = false
+reportMissingTypeArgument = false
+
+# https://docs.pytest.org/en/stable/reference/reference.html#configuration-options
+[tool.pytest]
+addopts = [
+    "-vvr aP",
+    "--tb=short",
+    "--capture=sys",
+]
+strict = true
+testpaths = ["./tests"]
+
+# https://docs.astral.sh/ruff/settings/
+[tool.ruff]
+line-length = 79
+extend-exclude = [
+    "**/generated",
+]
+
+[tool.ruff.lint]
+ignore = [
+    "F403", # undefined-local-with-import-star
+    "F405", # undefined-local-with-import-star-usage
+    "RUF022", # unsorted-dunder-all
+] # https://docs.astral.sh/ruff/rules/
+
+# https://docs.astral.sh/uv/reference/settings/
+[tool.uv]
+system-certs = true
+
+[tool.uv.pip]
+emit-index-url = true
+generate-hashes = true
+link-mode = "copy" # https://github.com/astral-sh/uv/issues/7918
+no-binary = ["stack-exchange-backup"]
+#no-build = true # prefer-binary: https://github.com/astral-sh/uv/issues/1794
+reinstall = true
+#require-hashes = true # Doesn't work for editable installs: https://github.com/pypa/pip/issues/4995
+strict = true
+universal = true
+upgrade = true
+verify-hashes = true

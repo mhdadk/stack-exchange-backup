@@ -1,0 +1,18 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/styling'
+description: |+
+  This type represents some stylings of a site in the Stack Exchange network.
+
+  These stylings are meant to allow developers to subtly vary the presentation of resources in their applications so as to indicate to users the original source site.
+
+  Applications should be able to gracefully handle these styles changes, though they can safely assume that these style changes are infrequent.
+
+  Note that colors can be returned either as six or three digit hex triplets.
+type: object
+properties:
+  link_color:
+    type: string
+  tag_background_color:
+    type: string
+  tag_foreground_color:
+    type: string

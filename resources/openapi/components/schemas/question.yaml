@@ -1,0 +1,136 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/question'
+description: |+
+  This type represents a question on one of the Stack Exchange sites, such as this famous RegEx question.
+
+  This type is heavily inspired by the question page itself, and can optionally return comments and answers accordingly.
+
+  The upvoted, downvoted, and favorited fields can only be queried for with an access_token with the private_info scope.
+type: object
+properties:
+  accepted_answer_id:
+    type: integer
+  answer_count:
+    type: integer
+  answers:
+    type: array
+    items:
+      $ref: './answer.yaml'
+  body:
+    type: string
+    description: unchanged in unsafe filters
+  body_markdown:
+    type: string
+    format: commonmark
+  bounty_amount:
+    type: integer
+  bounty_closes_date:
+    type: integer
+    format: int64
+  bounty_user:
+    $ref: './shallow_user.yaml'
+  can_answer:
+    type: boolean
+  can_close:
+    type: boolean
+  can_comment:
+    type: boolean
+  can_edit:
+    type: boolean
+  can_flag:
+    type: boolean
+  can_suggest_edit:
+    type: boolean
+  close_vote_count:
+    type: integer
+  closed_date:
+    type: integer
+    format: int64
+  closed_details:
+    $ref: './closed_details.yaml'
+  closed_reason:
+    type: string
+  collectives:
+    type: array
+    items:
+      $ref: './collective.yaml'
+  comment_count:
+    type: integer
+  comments:
+    type: array
+    items:
+      $ref: './comment.yaml'
+  community_owned_date:
+    type: integer
+    format: int64
+  content_license:
+    type: string
+  creation_date:
+    type: integer
+    format: int64
+  delete_vote_count:
+    type: integer
+  down_vote_count:
+    type: integer
+  downvoted:
+    type: boolean
+    description: private_info
+  favorite_count:
+    type: integer
+  favorited:
+    type: boolean
+    description: private_info
+  is_answered:
+    type: boolean
+  last_activity_date:
+    type: integer
+    format: int64
+  last_edit_date:
+    type: integer
+    format: int64
+  last_editor:
+    $ref: './shallow_user.yaml'
+  link:
+    type: string
+    description: unchanged in unsafe filters
+  locked_date:
+    type: integer
+    format: int64
+  migrated_from:
+    $ref: './migration_info.yaml'
+  migrated_to:
+    $ref: './migration_info.yaml'
+  notice:
+    $ref: './notice.yaml'
+  owner:
+    $ref: './shallow_user.yaml'
+  posted_by_collectives:
+    type: array
+    items:
+      $ref: './collective.yaml'
+  protected_date:
+    type: integer
+    format: int64
+  question_id:
+    type: integer
+    description: refers to a Question
+  reopen_vote_count:
+    type: integer
+  score:
+    type: integer
+  share_link:
+    type: string
+    description: unchanged in unsafe filters
+  tags:
+    type: array
+    items:
+      type: string
+  title:
+    type: string
+  up_vote_count:
+    type: integer
+  upvoted:
+    type: boolean
+    description: private_info
+  view_count:
+    type: integer

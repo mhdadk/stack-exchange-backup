@@ -1,0 +1,103 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/answer'
+description: |+
+  This type represents an answer to a question on one of the Stack Exchange sites, such as this famous answer of bobince's.
+
+  As on the question page, it is possible to fetch the comments on an answer as part of a call; though this is not done by default.
+
+  The upvoted, downvoted, and accepted fields can only be queried for with an access_token with the private_info scope.
+type: object
+properties:
+  accepted:
+    type: boolean
+  answer_id:
+    type: integer
+    description: refers to an Answer
+  awarded_bounty_amount:
+    type: integer
+  awarded_bounty_users:
+    type: array
+    items:
+      $ref: './shallow_user.yaml'
+  body:
+    type: string
+    description: unchanged in unsafe filters
+  body_markdown:
+    type: string
+    format: commonmark
+  can_comment:
+    type: boolean
+  can_edit:
+    type: boolean
+  can_flag:
+    type: boolean
+  can_suggest_edit:
+    type: boolean
+  collectives:
+    type: array
+    items:
+      $ref: './collective.yaml'
+  comment_count:
+    type: integer
+  comments:
+    type: array
+    items:
+      $ref: './comment.yaml'
+  community_owned_date:
+    type: integer
+    format: int64
+  content_license:
+    type: string
+  creation_date:
+    type: integer
+    format: int64
+  down_vote_count:
+    type: integer
+  downvoted:
+    type: boolean
+    description: private_info
+  is_accepted:
+    type: boolean
+  last_activity_date:
+    type: integer
+    format: int64
+  last_edit_date:
+    type: integer
+    format: int64
+  last_editor:
+    $ref: './shallow_user.yaml'
+  link:
+    type: string
+    description: unchanged in unsafe filters
+  locked_date:
+    type: integer
+    format: int64
+  owner:
+    $ref: './shallow_user.yaml'
+  posted_by_collectives:
+    type: array
+    items:
+      $ref: './collective.yaml'
+  question_id:
+    type: integer
+    description: refers to a Question
+  recommendations:
+    type: array
+    items:
+      $ref: './collective_recommendation.yaml'
+  score:
+    type: integer
+  share_link:
+    type: string
+    description: unchanged in unsafe filters
+  tags:
+    type: array
+    items:
+      type: string
+  title:
+    type: string
+  up_vote_count:
+    type: integer
+  upvoted:
+    type: boolean
+    description: private_info

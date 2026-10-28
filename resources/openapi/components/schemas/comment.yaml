@@ -1,0 +1,49 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/comment'
+description: |+
+  All Questions and Answers on a Stack Exchange site can be commented on, and this type represents those comments.
+
+  Comments can also be optionally directed at users, when this is the case the reply_to_user property is set (if it is requested in the current filter).
+
+  The upvoted field can only be queried for with an access_token with the private_info scope.
+type: object
+properties:
+  body:
+    type: string
+    description: unchanged in unsafe filters
+  body_markdown:
+    type: string
+    format: commonmark
+  can_flag:
+    type: boolean
+  comment_id:
+    type: integer
+    description: refers to a Comment
+  content_license:
+    type: string
+  creation_date:
+    type: integer
+    format: int64
+  edited:
+    type: boolean
+  link:
+    type: string
+    description: unchanged in unsafe filters
+  owner:
+    $ref: './shallow_user.yaml'
+  post_id:
+    type: integer
+    description: refers to a Post
+  post_type:
+    type: string
+    enum:
+      - question
+      - answer
+      - article
+  reply_to_user:
+    $ref: './shallow_user.yaml'
+  score:
+    type: integer
+  upvoted:
+    type: boolean
+    description: private_info

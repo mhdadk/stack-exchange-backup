@@ -1,0 +1,19 @@
+externalDocs:
+  url: 'https://api.stackexchange.com/docs/types/network-post'
+description: |+
+  This type represents a post on the network, however it is greatly reduced when compared to the full Post type to reduce the amount of work that needs to be done to fetch it from multiple sites in the network.
+type: object
+properties:
+  post_id:
+    type: integer
+    description: refers to a Post
+  post_type:
+    type: string
+    enum:
+      - question
+      - answer
+      - article
+  score:
+    type: integer
+  title:
+    type: string
